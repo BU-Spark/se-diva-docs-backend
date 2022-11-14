@@ -33,5 +33,9 @@ def read_from_mongo(database, collection):
 
     # READ from the collection in the database & print
 
-    for x in mycol.find():
-        print(x)
+    output_list = []
+
+    for x in mycol.find({}, {"_id": 0}):
+        output_list.append(x)
+
+    return output_list

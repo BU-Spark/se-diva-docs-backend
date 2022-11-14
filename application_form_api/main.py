@@ -16,4 +16,4 @@ def store_applicants(applicant: Applicant):
 
 @app.get("/applicants/view")
 def view_applicants():
-    return db
+    return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications') # For now, SubmittedApplications
