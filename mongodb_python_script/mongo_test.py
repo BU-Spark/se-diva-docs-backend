@@ -1,23 +1,37 @@
 import pymongo
 
-# Establish Connection to MongoDB
+def write_to_mongo(document, database, collection):
+     # Establish Connection to MongoDB
 
-client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
 
-# Select Database
+    # Select Database
 
-mydb = client["MemberPortal"]
+    mydb = client[database]
 
-# Select Collection
+    # Select Collection
 
-mycol = mydb["application_forms"]
+    mycol = mydb[collection]
 
-# WRITE to the collection in the database
+    # WRITE to the collection in the database
 
-mydict = { "__id": "test", "First Name": "Test", "Last Name": "Test" }
-x = mycol.insert_one(mydict)
+    x = mycol.insert_one(document)
 
-# READ from the collection in the database & print
+def read_from_mongo(database, collection):
 
-for x in mycol.find():
-    print(x)
+    # Establish Connection to MongoDB
+
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+
+    # Select Database
+
+    mydb = client[database]
+
+    # Select Collection
+
+    mycol = mydb[collection]
+
+    # READ from the collection in the database & print
+
+    for x in mycol.find():
+        print(x)
