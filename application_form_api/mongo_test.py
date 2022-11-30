@@ -55,7 +55,7 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     mycol = mydb[collection]
 
-    #data =  file
+    f = open(file)
 
     fs = gridfs.GridFS(mydb)
 
