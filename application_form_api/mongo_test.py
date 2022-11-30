@@ -1,5 +1,6 @@
 import pymongo
 import gridfs
+import base64
 
 def write_to_mongo(document, database, collection):
      # Establish Connection to MongoDB
@@ -55,11 +56,9 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     mycol = mydb[collection]
 
-    f = open(file)
-
     fs = gridfs.GridFS(mydb)
 
-    fs.put(file.read(), filename = file_name)
+    fs.put(file, filename = file_name)
 
 def download_file_from_mongo(database):
 
