@@ -60,7 +60,7 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     fs.put(file, filename = file_name)
 
-def download_file_from_mongo(database):
+def download_file_from_mongo(database, file_name):
 
     # Establish Connection to MongoDB
 
@@ -68,11 +68,10 @@ def download_file_from_mongo(database):
 
     mydb = client[database]
 
-    output_list = []
+    data = mydb.fs.files.find_one({'filename' : file_name})
 
-    for x in mydb.fs.files.find({}):
-        my_id = x['_id']
-        outputdata = fs.get(my_id).read()
-        output_list.append(outputdata)
+    my_id = data['_id']
 
-    return output_list
+    outputdata = fs.get(my_id).read()
+
+    return outputdata
