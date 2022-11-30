@@ -55,11 +55,11 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     mycol = mydb[collection]
 
-    data =  file
+    #data =  file
 
     fs = gridfs.GridFS(mydb)
 
-    fs.put(data, filename = file_name)
+    fs.put(file.read(), filename = file_name)
 
 def download_file_from_mongo(database):
 
