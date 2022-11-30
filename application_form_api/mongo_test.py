@@ -1,6 +1,5 @@
 import pymongo
 import gridfs
-import base64
 
 def write_to_mongo(document, database, collection):
      # Establish Connection to MongoDB
