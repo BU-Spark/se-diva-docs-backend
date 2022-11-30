@@ -1,4 +1,5 @@
 import pymongo
+import GridFS
 
 def write_to_mongo(document, database, collection):
      # Establish Connection to MongoDB
@@ -54,7 +55,7 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     mycol = mydb[collection]
 
-    data =  file
+    data =  file.read()
 
     fs = gridfs.GridFS(mydb)
 
