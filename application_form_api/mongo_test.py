@@ -39,3 +39,23 @@ def read_from_mongo(database, collection):
         output_list.append(x)
 
     return output_list
+
+def upload_file_to_mongo(database, collection, file, file_name):
+
+    # Establish Connection to MongoDB
+
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+
+    # Select Database
+
+    mydb = client[database]
+
+    # Select Collection
+
+    mycol = mydb[collection]
+
+    data =  file
+
+    fs = gridfs.GridFS(mycol)
+
+    fs.put(data, filename = file_name)
