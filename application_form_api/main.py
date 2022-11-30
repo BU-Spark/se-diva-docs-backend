@@ -1,11 +1,17 @@
 from typing import List
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File
+from fastapi import APIRouter
+
+
+from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
+from os import getcwd
+from fastapi.responses import FileResponse
 
 
 app = FastAPI()
-
+router = APIRouter()
 db: List[Applicant] = []
 
 @app.post("/applicants/add")
@@ -17,3 +23,16 @@ def store_applicants(applicant: Applicant):
 @app.get("/applicants/view")
 def view_applicants():
     return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications') # For now, SubmittedApplications
+
+@app.post("/applicants/resume/upload")
+async def upload_file(file: UploadFile = File(...)):
+    with open(file.filename, 'wb') as f:
+        content = await file.read()
+        f.write(content)
+        f.close()
+    return JSONResponse(content={"filename": file.filename},
+status_code=200)
+
+@app.get("/applicants/downloadresume/{name_file}")
+def download_file(name_file: str):
+    return FileResponse(path=getcwd() + "/" + name_file, media_type='application/octet-stream', filename=name_file)
