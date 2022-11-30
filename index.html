@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p>Click on the "Choose File" button to upload a file:</p>
+
+<form action="/action_page.php">
+  <input type="file" id="myFile" name="filename">
+  <input type="submit">
+</form>
+
+</body>
+
+<script>
+    form = new FormData();
+    form.append("file", myFile);
+    let response = await fetch('/file', {
+        method: 'POST',
+        body: form
+        });
+
+        let result = await response.json();
+</script>
+
+</html>
