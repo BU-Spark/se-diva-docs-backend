@@ -68,7 +68,7 @@ def download_file_from_mongo(database, file_name):
 
     mydb = client[database]
 
-    fs = gridfs.GridFS(database)
+    fs = gridfs.GridFS(mydb)
 
     data = mydb.fs.files.find_one({'filename' : file_name})
 
