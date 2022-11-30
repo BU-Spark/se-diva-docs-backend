@@ -56,6 +56,23 @@ def upload_file_to_mongo(database, collection, file, file_name):
 
     data =  file
 
-    fs = gridfs.GridFS(mycol)
+    fs = gridfs.GridFS(mydb)
 
     fs.put(data, filename = file_name)
+
+def download_file_from_mongo(database):
+
+    # Establish Connection to MongoDB
+
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+
+    mydb = client[database]
+
+    output_list = []
+
+    for x in mydb.fs.files.find({}):
+        my_id = x['_id']
+        outputdata = fs.get(my_id).read()
+        output_list.append(outputdata)
+
+    return output_list
