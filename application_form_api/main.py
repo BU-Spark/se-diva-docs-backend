@@ -24,7 +24,11 @@ def view_applicants():
 
 @app.post("/applicants/resume/upload")
 async def upload_file(file: UploadFile = File(...)):
-    mongo_test.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', file, file.filename)
+    with open(file.filename, 'wb') as f:
+        content = await file.read()
+        f.write(content)
+        f.close()
+        mongo_test.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', f, file.filename)
     return JSONResponse(content={"filename": file.filename}, status_code=200)
 
 @app.get("/applicants/downloadresume/{name_file}")

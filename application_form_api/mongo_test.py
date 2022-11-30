@@ -1,5 +1,5 @@
 import pymongo
-import GridFS
+import gridfs
 
 def write_to_mongo(document, database, collection):
      # Establish Connection to MongoDB
