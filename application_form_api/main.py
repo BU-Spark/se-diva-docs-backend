@@ -1,8 +1,6 @@
 from typing import List
 from fastapi import FastAPI, UploadFile, File
 from fastapi import APIRouter
-
-
 from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
@@ -26,13 +24,10 @@ def view_applicants():
 
 @app.post("/applicants/resume/upload")
 async def upload_file(file: UploadFile = File(...)):
-    with open(file.filename, 'wb') as f:
-        content = await file.read()
-        f.write(content)
-        f.close()
-    return JSONResponse(content={"filename": file.filename},
-status_code=200)
+    mongo_test.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', file, file.filename)
+    return JSONResponse(content={"filename": file.filename}, status_code=200)
 
 @app.get("/applicants/downloadresume/{name_file}")
 def download_file(name_file: str):
+    resumelist = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
     return FileResponse(path=getcwd() + "/" + name_file, media_type='application/octet-stream', filename=name_file)
