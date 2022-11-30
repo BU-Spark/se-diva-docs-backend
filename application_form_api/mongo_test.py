@@ -63,11 +63,12 @@ def upload_file_to_mongo(database, collection, file, file_name):
 def download_file_from_mongo(database, file_name):
 
     # Establish Connection to MongoDB
-    fs = gridfs.GridFS(mydb)
 
     client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
 
     mydb = client[database]
+
+    fs = gridfs.GridFS(database)
 
     data = mydb.fs.files.find_one({'filename' : file_name})
 
