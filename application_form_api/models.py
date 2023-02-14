@@ -74,7 +74,7 @@ m = Applicant(
     suffix="MD",
     primary_email="john.doe@gmail.com",
     phone_number="6171231111",
-    address= Address(
+    address=Address(
         street="123 Fruit St",
         city="Boston",
         state="MA",
@@ -92,11 +92,11 @@ m = Applicant(
     divadocs_boston_member= DivaDocsBostonMember(
         divadocs_boston_member_question= DivaDocsBostonMemberQuestion.yes
     ),
-    race_ethnicity= "Asian/Asian American",
+    race_ethnicity="Asian/Asian American",
     gender_identity="Male",
     pronouns="He/Him",
-    will_sponsor_question= SponsorQuestion(
-        sponsor_question_answer = SponsorQuestionAnswers.yes
+    will_sponsor_question=SponsorQuestion(
+        sponsor_question_answer=SponsorQuestionAnswers.yes
     )
 )
 #print(m.json())

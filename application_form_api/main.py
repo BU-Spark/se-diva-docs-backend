@@ -4,16 +4,10 @@ from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
 from fastapi.responses import Response
-from starlette_validation_uploadfile import ValidateUploadFileMiddleware
 
 app = FastAPI()
 router = APIRouter()
-app.add_middleware(
-        ValidateUploadFileMiddleware,
-        app_path="/applicants/resume/upload",
-        max_size=31457280, #30 Megabytes max upload
-        file_type=["application/pdf"]
-)
+
 
 @app.post("/applicants/add")
 def store_applicants(applicant: Applicant):
@@ -21,9 +15,11 @@ def store_applicants(applicant: Applicant):
     mongo_test.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications')
     return applicant
 
+
 @app.get("/applicants/view")
 def view_applicants():
     return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+
 
 @app.post("/applicants/resume/upload")
 async def upload_file(upload_file: UploadFile = File(...)):
