@@ -31,5 +31,6 @@ outputdata = fs.get(my_id).read()
 download_location = "/Users/vinaymetlapalli/Desktop/" + "abhinoorpdf.pdf"
 output = open(download_location, "wb")
 output.write(outputdata)
+print(type(outputdata))
 output.close()
 print("download complete")

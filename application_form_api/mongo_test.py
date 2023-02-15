@@ -1,5 +1,12 @@
 import pymongo
 import gridfs
+import smtplib
+import random
+from email.mime.text import MIMEText
+import stripe
+import smtplib
+from email.mime.multipart import MIMEMultipart
+#from bson.objectid import ObjectId
 
 def write_to_mongo(document, database, collection):
      # Establish Connection to MongoDB
@@ -76,3 +83,91 @@ def download_file_from_mongo(database, file_name):
     outputdata = fs.get(my_id).read()
 
     return outputdata
+
+def send_email(recipient_email):
+    # Email settings
+    from_email = "vinay.metlapalli@gmail.com"
+    to_email = "abhinoor@bu.edu"
+    password = "mttjbrfwvzxsouql"
+
+    # Generate a 4-digit passcode
+    passcode = str(random.randint(1000, 9999))
+
+    # Compose the email message
+    #message = f"Your application to the BlackWomenMDNetwork has been approved. Visit our website at: https://blackwomenmdnetwork.com/ and use this passcode when creating an account: {passcode}"
+    # Compose the email message
+    message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved! Visit our website at: https://blackwomenmdnetwork.com/ and use this passcode when creating an account: {passcode}")
+    message['From'] = from_email
+    message['To'] = to_email
+    message['Subject'] = 'Your BlackWomenMDNetwork Application has been Approved!'
+
+
+    # Connect to the email server
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(from_email, password)
+
+    # Send the email
+    server.sendmail(from_email, to_email, message.as_string())
+
+    # Close the server connection
+    server.quit()
+
+    print("Passcode sent successfully!")
+
+def create_payment(applicant_email, subscription_tier):
+
+    stripe.api_key = "pk_test_51MbreiIOQGSqv0xRCWTQ0hCuIfobUrGaUnS65FJOZuciEbvFR1VAfaKq9IAnxb7voFde4eyDC2mSran5ugKjpKJN00J4syPLmB"
+
+    payment_intent = stripe.PaymentIntent.create(
+        amount=subscription_tier, # Will change
+        currency='usd',
+        payment_method_types=['card'],
+        description='Application Fee for ' + applicant_email,
+        statement_descriptor='Application Fee',
+        metadata={
+            'email': applicant_email
+        }
+    )
+    payment_link = payment_intent['client_secret']
+    # Save payment link and applicant information in your database
+    
+    # Establish Connection to MongoDB
+
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+
+    # Select Database
+
+    mydb = client['ApplicationForm']
+
+    # Select Collection
+
+    mycol = mydb['SubmittedApplications']
+
+    # specify the document by the email field
+    
+    query = {"email": "user_email"}
+
+    # specify the field you want to update and its new value
+    
+    set_payment_link = {"$set": {"applicant_status.payment_link": payment_link}}
+    set_status = {"$set": {"applicant_status.approved": True}}
+
+    # update the document using the update_one method
+    mycol.update_one(query, set_payment_link)
+    mycol.update_one(query, set_status)
+
+
+    # 2. Send payment link to applicant via email
+    msg = MIMEMultipart()
+    msg['From'] = 'vinay.metlapalli@gmail.com'
+    msg['To'] = applicant_email
+    msg['Subject'] = 'Payment Required for Website Access'
+    body = 'Please click on the following link to make your payment: ' + payment_link
+    msg.attach(MIMEText(body, 'plain'))
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login('vinay.metlapalli@gmail.com', 'mttjbrfwvzxsouql')
+    text = msg.as_string()
+    server.sendmail('vinay.metlapalli@gmail.com', applicant_email, text)
+    server.quit()
