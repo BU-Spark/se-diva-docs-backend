@@ -119,17 +119,19 @@ def create_payment(applicant_email, payment_amount):
 
     stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 
-    payment_intent = stripe.PaymentIntent.create(
-        amount=payment_amount, # Will change
+    stripe.Price.create(currency="usd", unit_amount=1000, product='{{PRODUCT_ID}}')
+
+    payment_link = stripe.PaymentLink.create(
+        amount=payment_amount,
         currency='usd',
-        payment_method_types=['card'],
+        refresh_url='www.google.com',
+        return_url='www.google.com',
         description='Application Fee for ' + applicant_email,
-        statement_descriptor='Application Fee',
         metadata={
             'email': applicant_email
         }
-    )
-    payment_link = payment_intent['client_secret']
+    )['url']
+    
     # Save payment link and applicant information in your database
     
     # Establish Connection to MongoDB
