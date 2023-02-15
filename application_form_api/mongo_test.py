@@ -165,7 +165,7 @@ def create_payment(applicant_email, payment_amount):
     msg['From'] = 'vinay.metlapalli@gmail.com'
     msg['To'] = applicant_email
     msg['Subject'] = 'Payment Required for Website Access'
-    body = 'Please click on the following link to make your payment: ' + payment_link
+    body = 'Please click on the following link to make your payment: ' + str(payment_link['url'])
     msg.attach(MIMEText(body, 'plain'))
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
