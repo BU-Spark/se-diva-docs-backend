@@ -68,7 +68,8 @@ class Applicant(BaseModel):
     membership_directory_agreement: YesNoDontKnowResponse
     resume_included_question: YesNoDontKnowResponse
     divadocs_boston_member: DivaDocsBostonMember
-    race_ethnicity: str
+    race: List[str]
+    ethnicity: List[str]
     gender_identity: str
     pronouns: str
     will_sponsor_question: SponsorQuestion
