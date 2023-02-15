@@ -115,12 +115,12 @@ def send_email(recipient_email):
 
     print("Passcode sent successfully!")
 
-def create_payment(applicant_email, subscription_tier):
+def create_payment(applicant_email, payment_amount):
 
     stripe.api_key = "pk_test_51MbreiIOQGSqv0xRCWTQ0hCuIfobUrGaUnS65FJOZuciEbvFR1VAfaKq9IAnxb7voFde4eyDC2mSran5ugKjpKJN00J4syPLmB"
 
     payment_intent = stripe.PaymentIntent.create(
-        amount=subscription_tier, # Will change
+        amount=payment_amount, # Will change
         currency='usd',
         payment_method_types=['card'],
         description='Application Fee for ' + applicant_email,
