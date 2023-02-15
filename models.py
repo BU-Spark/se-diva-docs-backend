@@ -31,8 +31,8 @@ class BWMDNChapterQuestion(str, Enum):
     no_additional = "No, but I would like more information about starting a branch in my region"
 
 class AddressType(str, Enum):
-    work = "work"
-    personal = "personal"
+    work = "Work"
+    personal = "Home"
 
 class Address(BaseModel):
     street: str
