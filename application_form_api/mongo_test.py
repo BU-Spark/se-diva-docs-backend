@@ -117,20 +117,20 @@ def send_email(recipient_email):
 
 def create_payment(applicant_email, payment_amount):
 
+    # Set your API key
     stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 
-    #stripe.Price.create(currency="usd", unit_amount=1000, product='{{PRODUCT_ID}}')
+    # Get the product ID for the existing product in Stripe
+    product_id = "prod_NMcFlXPcoySWZy"
 
-    payment_link = stripe.PaymentLink.create(
-        amount=payment_amount,
-        currency='usd',
-        refresh_url='www.google.com',
-        return_url='www.google.com',
-        description='Application Fee for ' + applicant_email,
-        metadata={
-            'email': applicant_email
-        }
-    )['url']
+    # Create a Price object for the product
+    price = stripe.Price.create(
+        unit_amount=1000,  # The price in cents
+        currency="usd",
+        product=product_id,
+    )
+    payment_link = stripe.PaymentLink.create(line_items=[{"price": 'price_1MbtLkIOQGSqv0xRSLJAeh9d', "quantity": 1}])
+
     
     # Save payment link and applicant information in your database
     
