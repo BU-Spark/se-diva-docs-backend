@@ -52,7 +52,7 @@ class Applicant(BaseModel):
     first_name: str
     middle_name: Optional[str]
     last_name: str
-    suffix: str
+    suffix: Optional[str]
     primary_email: str
     secondary_email: Optional[str]
     phone_number: str
