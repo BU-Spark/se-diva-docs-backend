@@ -4,10 +4,31 @@ from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
 from fastapi.responses import Response
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 router = APIRouter()
 
+# Configure CORS
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+subscription_tier_list = {
+    "student": 100,
+    "premed": 200,
+    "doctor": 300
+}
 
 @app.post("/applicants/add")
 def store_applicants(applicant: Applicant):
@@ -37,3 +58,9 @@ async def upload_file(upload_file: UploadFile = File(...)):
 def download_file(name_file: str):
     fileFromDB = mongo_test.download_file_from_mongo('ApplicationForm', name_file)
     return Response(fileFromDB, media_type='application/pdf')
+
+@app.post("/applicants/requestpayment")
+def requestpayment(applicant: Applicant):
+    applicant_dict = applicant.dict()
+    mongo_test.create_payment(applicant_dict["primary_email"], subscription_tier_list[applicant_dict["applicant_status"]["subscription_tier"]])
+    return JSONResponse(content={"success": "Applicant Approved, Payment Requeste"}, status_code=200)
