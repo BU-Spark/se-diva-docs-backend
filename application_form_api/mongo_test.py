@@ -119,7 +119,7 @@ def create_payment(applicant_email, payment_amount):
 
     stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 
-    stripe.Price.create(currency="usd", unit_amount=1000, product='{{PRODUCT_ID}}')
+    #stripe.Price.create(currency="usd", unit_amount=1000, product='{{PRODUCT_ID}}')
 
     payment_link = stripe.PaymentLink.create(
         amount=payment_amount,
