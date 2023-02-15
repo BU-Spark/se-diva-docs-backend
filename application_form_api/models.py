@@ -42,9 +42,11 @@ class Address(BaseModel):
     zip_code: str
     country: str
 class ApplicantStatus(BaseModel):
-    subscription_tier: str
-    approved: bool
-    paid: bool
+    subscription_tier: Optional[str]
+    approved: Optional[bool]
+    paid: Optional[bool]
+    payment_link: Optional[str]
+    account_password: Optional[str]
 class Applicant(BaseModel):
     universal_applicant_id: str
     first_name: str
@@ -73,37 +75,55 @@ class Applicant(BaseModel):
     applicant_status: ApplicantStatus
 
 
-m = Applicant(
+dummy_applicant = Applicant(
+    universal_applicant_id="123456",
     first_name="John",
-    last_name="Doe",
-    suffix="MD",
-    primary_email="john.doe@gmail.com",
-    phone_number="6171231111",
+    middle_name="Doe",
+    last_name="Smith",
+    suffix="Jr.",
+    primary_email="john.smith@example.com",
+    secondary_email="j.smith@example.com",
+    phone_number="555-123-4567",
     address=Address(
-        street="123 Fruit St",
-        city="Boston",
-        state="MA",
-        zip_code="02119",
+        street="123 Main St",
+        apartment="Apt 2",
+        city="Anytown",
+        state="CA",
+        zip_code="12345",
         country="USA"
     ),
-    address_type=AddressType.work,
-    specialty="Dermatology",
-    areas_of_work="Academic",
-    geographic_region="Region 1 - CT,ME,MA,NH,RI and VT",
-    bwmdn_chapter_question=BWMDNChapterQuestion.yes,
-    current_academic_affiliation="MA-Boston University School of Medicine",
+    address_type=AddressType.personal,
+    current_academic_affiliation="University of Anytown",
+    current_hospital_company="Anytown General Hospital",
+    current_position="Resident",
+    specialty="Internal Medicine",
+    areas_of_work="Primary Care, Inpatient Care",
+    geographic_region="West Coast",
+    bwmdn_chapter_question=BWMDNChapterQuestion.no,
     membership_directory_agreement=YesNoDontKnowResponse.yes,
-    resume_included_question= YesNoDontKnowResponse.yes,
-    divadocs_boston_member= DivaDocsBostonMember(
-        divadocs_boston_member_question= DivaDocsBostonMemberQuestion.yes
+    resume_included_question=YesNoDontKnowResponse.yes,
+    divadocs_boston_member=DivaDocsBostonMember(
+        divadocs_boston_member_question=DivaDocsBostonMemberQuestion.no,
+        years="3"
     ),
-    race_ethnicity="Asian/Asian American",
+    race_ethnicity="White",
     gender_identity="Male",
     pronouns="He/Him",
     will_sponsor_question=SponsorQuestion(
-        sponsor_question_answer=SponsorQuestionAnswers.yes
+        sponsor_question_answer=SponsorQuestionAnswers.yes,
+        activities_interested=["Networking", "Mentorship"]
+    ),
+    applicant_status=ApplicantStatus(
+        subscription_tier="",
+        approved=True,
+        paid=False,
+        payment_link="",
+        account_password=""
     )
 )
+
+print(dummy_applicant.json())
+
 #print(m.json())
 
 
