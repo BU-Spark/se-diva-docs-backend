@@ -117,7 +117,7 @@ def send_email(recipient_email):
 
 def create_payment(applicant_email, payment_amount):
 
-    stripe.api_key = "pk_test_51MbreiIOQGSqv0xRCWTQ0hCuIfobUrGaUnS65FJOZuciEbvFR1VAfaKq9IAnxb7voFde4eyDC2mSran5ugKjpKJN00J4syPLmB"
+    stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 
     payment_intent = stripe.PaymentIntent.create(
         amount=payment_amount, # Will change
