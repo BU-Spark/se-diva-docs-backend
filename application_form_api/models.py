@@ -41,8 +41,12 @@ class Address(BaseModel):
     state: str
     zip_code: str
     country: str
-    
+class ApplicantStatus(BaseModel):
+    subscription_tier: str
+    approved: bool
+    paid: bool
 class Applicant(BaseModel):
+    universal_applicant_id: str
     first_name: str
     middle_name: Optional[str]
     last_name: str
@@ -66,6 +70,7 @@ class Applicant(BaseModel):
     gender_identity: str
     pronouns: str
     will_sponsor_question: SponsorQuestion
+    applicant_status: ApplicantStatus
 
 
 m = Applicant(
