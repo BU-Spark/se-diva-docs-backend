@@ -2,37 +2,45 @@ from pydantic import BaseModel
 from typing import Optional, List
 from enum import Enum
 
+
 class SponsorQuestionAnswers(str, Enum):
     no = "No"
     yes = "Yes"
-    no_additional = "No, but I will consider in the future"
+    no
+
 
 class SponsorQuestion(BaseModel):
     sponsor_question_answer: SponsorQuestionAnswers
     activities_interested: Optional[List[str]]
+
 
 class DivaDocsBostonMemberQuestion(str, Enum):
     no = "No"
     yes = "Yes"
     no_additional = "No, but I live in Greater Boston and would like to join"
 
+
 class DivaDocsBostonMember(BaseModel):
     divadocs_boston_member_question: DivaDocsBostonMemberQuestion
     years: Optional[str]
+
 
 class YesNoDontKnowResponse(str, Enum):
     no = "No"
     yes = "Yes"
     dont_know = "Don't Know"
 
+
 class BWMDNChapterQuestion(str, Enum):
     no = "No"
     yes = "Yes"
     no_additional = "No, but I would like more information about starting a branch in my region"
 
+
 class AddressType(str, Enum):
     work = "Work"
     personal = "Home"
+
 
 class Address(BaseModel):
     street: str
@@ -41,12 +49,16 @@ class Address(BaseModel):
     state: str
     zip_code: str
     country: str
+
+
 class ApplicantStatus(BaseModel):
     subscription_tier: Optional[str]
     approved: Optional[bool]
     paid: Optional[bool]
     payment_link: Optional[str]
     account_password: Optional[str]
+
+
 class Applicant(BaseModel):
     universal_applicant_id: str
     first_name: str
@@ -126,5 +138,3 @@ class Applicant(BaseModel):
 # print(dummy_applicant.json())
 
 # #print(m.json())
-
-
