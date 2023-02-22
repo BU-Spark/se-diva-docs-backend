@@ -91,11 +91,11 @@ async def handle_webhook(request: Request):
         raise HTTPException(status_code=401, detail=str(e))
 
     # Handle the event
-    if event.type == 'checkout.session.completed':
+    if event.type == 'customer.subscription.created':
         session = event.data.object
-        payment_intent = session.metadata.intent_id
-        print("payment_intent: " + payment_intent)
-        return JSONResponse(content={'payment_intent': payment_intent})
+        customer_id = session.customer
+        print("customer_id: " + customer_id)
+        return JSONResponse(content={'customer_id': customer_id})
         # Do something with the payment_intent object, e.g. mark the order as paid
 
     # Return a 200 response to acknowledge receipt of the event
