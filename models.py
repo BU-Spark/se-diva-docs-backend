@@ -55,12 +55,12 @@ class ApplicantStatus(BaseModel):
     subscription_tier: Optional[str]
     approved: Optional[bool]
     paid: Optional[bool]
-    payment_link: Optional[str]
+    stripe_customer_id: Optional[str]
     account_password: Optional[str]
 
 
 class Applicant(BaseModel):
-    universal_applicant_id: str
+    id: str
     first_name: str
     middle_name: Optional[str]
     last_name: str
