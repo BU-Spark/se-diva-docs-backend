@@ -92,8 +92,8 @@ async def handle_webhook(request: Request):
 
     # Handle the event
     if event.type == 'checkout.session.completed':
-        # payment_intent = event.data.object
-        return JSONResponse(content={'received': True})
+        payment_intent = event.data.payment_intent
+        return JSONResponse(content={'payment_intent': payment_intent})
         # Do something with the payment_intent object, e.g. mark the order as paid
 
     # Return a 200 response to acknowledge receipt of the event
