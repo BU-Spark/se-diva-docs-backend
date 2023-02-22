@@ -10,7 +10,7 @@ import stripe
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
-webhook_secret = "whsec_34d1b16bc211ba244123bf9fccebf7e286632563298ca36bc186df76d5bf09b6"
+webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
 
 app = FastAPI()
 router = APIRouter()
