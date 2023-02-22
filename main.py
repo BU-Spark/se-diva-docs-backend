@@ -91,6 +91,7 @@ async def handle_webhook(request: Request):
         raise HTTPException(status_code=401, detail=str(e))
 
     # Handle the event
+    universal_applicant_id = ""
     if event.type == 'checkout.session.completed':
         session = event.data.object
         universal_applicant_id = session.metadata.u_id
