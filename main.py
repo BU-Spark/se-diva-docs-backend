@@ -83,6 +83,9 @@ async def handle_webhook(request: Request):
         event = stripe.Webhook.construct_event(
             payload, sig_header, webhook_secret
         )
+        event2 = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
     except ValueError as e:
         # Invalid payload
         raise HTTPException(status_code=400, detail=str(e))
@@ -95,7 +98,7 @@ async def handle_webhook(request: Request):
     if event.type == 'checkout.session.completed':
         session = event.data.object
         universal_applicant_id = session.metadata.u_id
-    if event.type == 'customer.subscription.created':
+    if event2.type == 'customer.subscription.created':
         session = event.data.object
         customer_id = session.customer
         print("u_id: " + universal_applicant_id)
