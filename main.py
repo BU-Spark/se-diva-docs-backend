@@ -83,9 +83,6 @@ async def handle_webhook(request: Request):
         event = stripe.Webhook.construct_event(
             payload, sig_header, webhook_secret
         )
-        event2 = stripe.Webhook.construct_event(
-            payload, sig_header, webhook_secret
-        )
     except ValueError as e:
         # Invalid payload
         raise HTTPException(status_code=400, detail=str(e))
@@ -94,27 +91,13 @@ async def handle_webhook(request: Request):
         raise HTTPException(status_code=401, detail=str(e))
 
     # Handle the event
-    universal_applicant_id = ""
-    if event.type == 'checkout.session.completed' or event.type == 'customer.subscription.created':
-        if event.type == 'checkout.session.completed':
-            session = event.data.object
-            universal_applicant_id = session.metadata.u_id
-        elif event.type == 'customer.subscription.created':
-            session = event.data.object
-            customer_id = session.customer
-            print("u_id: " + universal_applicant_id)
-            print("customer_id: " + customer_id)
-            return JSONResponse(content={'customer_id': customer_id})
-    # if event.type == 'checkout.session.completed':
-    #     session = event.data.object
-    #     universal_applicant_id = session.metadata.u_id
-    # if event2.type == 'customer.subscription.created':
-    #     session = event.data.object
-    #     customer_id = session.customer
-    #     print("u_id: " + universal_applicant_id)
-    #     print("customer_id: " + customer_id)
-    #     return JSONResponse(content={'customer_id': customer_id})
-        # Do something with the payment_intent object, e.g. mark the order as paid
+    if event.type == 'checkout.session.completed':
+        session = event.data.object
+        universal_applicant_id = session.metadata.u_id
+        customer_id = session.customer
+        print("u_id: " + universal_applicant_id)
+        print("customer_id: " + customer_id)
+        return JSONResponse(content={'customer_id': customer_id})
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
