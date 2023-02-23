@@ -72,7 +72,7 @@ def download_file(name_file: str):
     return Response(fileFromDB, media_type='application/pdf')
 
 
-@app.post("/applicants/requestpayment")
+@app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
     return mongo_test.send_payment(applicant_dict["id"])
