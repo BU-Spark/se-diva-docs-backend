@@ -145,7 +145,7 @@ def send_payment(u_id):
 
     # Delete the Applicant from Submitted Applications
 
-    source_collection.delete_one({'_id': 'document_id'})
+    source_collection.delete_one({'id': id})
 
     # Close the MongoDB connection
     
@@ -154,7 +154,7 @@ def send_payment(u_id):
     # Set your API key ---
     
     stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
-
+    
     # Generate the Link
 
     Joycelyn_Elders_Society_PID = "price_1MeN0IIOQGSqv0xR4a3TP4kh"
@@ -211,8 +211,6 @@ def send_payment(u_id):
         server.login(from_email, password)
     except Exception as e:
         return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
-
-    
 
     # Send the email
     try:
