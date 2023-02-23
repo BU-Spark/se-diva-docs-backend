@@ -123,10 +123,13 @@ def send_payment(u_id):
 
     # Connect to MongoDB
 
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-    db = client['ApplicationForm']
-    source_collection = db['SubmittedApplications']
-    target_collection = db['ApprovedApplications']
+    try:
+        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+        db = client['ApplicationForm']
+        source_collection = db['SubmittedApplications']
+        target_collection = db['ApprovedApplications']
+    except Exception as e:
+        return{'error':'mongo connection error'}
 
     # Find the document with "id" field equals to U_ID
     
@@ -183,6 +186,8 @@ def send_payment(u_id):
         line_items=[{"price": Nancy_Oriol_Society_PID, "quantity": 1}],
         metadata={"id": id}
     )
+    else:
+        return {'error': 'Subscription Tier Not Assigned'}
 
     # Send Email ----
 
@@ -198,12 +203,22 @@ def send_payment(u_id):
     message['Subject'] = 'Your BlackWomenMDNetwork Application has been Approved!'
 
     # Connect to the email server
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(from_email, password)
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(from_email, password)
+    except Exception as e:
+        return {'error': 'not able to connect to email server'}
+
+    
 
     # Send the email
-    server.sendmail(from_email, to_email, message.as_string())
+    try:
+    # Send the email
+        server.sendmail(from_email, to_email, message.as_string())
+    except Exception as e:
+        # Return error message if email not sent successfully
+        return {'error': 'email not sent'}
 
     # Close the server connection
     server.quit()
