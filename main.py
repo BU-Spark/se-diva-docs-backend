@@ -46,11 +46,13 @@ def store_applicants(applicant: Applicant):
 
 
 @app.get("/applicants/view")
-def view_applicants():
-    return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+def view_applicants(response: Response):
+    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    response.headers["X-Total-Count"] = str(len(applicants))
+    return applicants
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants():
+def view_approved_applicants(): 
     return mongo_test.get_all_approved()
 
 
