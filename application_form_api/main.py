@@ -71,8 +71,7 @@ def download_file(name_file: str):
 @app.post("/applicants/requestpayment")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    mongo_test.send_payment(applicant_dict["id"])
-    return JSONResponse(content={"success": "Applicant Approved, Payment Requested"}, status_code=200)
+    return mongo_test.send_payment(applicant_dict["id"])
 
 
 @app.post('/webhook')
@@ -104,7 +103,7 @@ async def handle_webhook(request: Request):
     client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
     db = client['ApplicationForm']
     target_collection = db['ApprovedApplications']
-    
+
     # Update document
     query = {"id": str(universal_applicant_id)}
     new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id)}}
