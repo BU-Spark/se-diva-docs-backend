@@ -7,6 +7,7 @@ from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request, HTTPException
 import stripe
+import pymongo
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
@@ -48,6 +49,10 @@ def store_applicants(applicant: Applicant):
 def view_applicants():
     return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
 
+@app.get("/approvedapplicants/view")
+def view_approved_applicants():
+    return mongo_test.get_all_approved()
+
 
 @app.post("/applicants/resume/upload")
 async def upload_file(upload_file: UploadFile = File(...)):
@@ -67,11 +72,10 @@ def download_file(name_file: str):
     return Response(fileFromDB, media_type='application/pdf')
 
 
-@app.post("/applicants/requestpayment")
+@app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    mongo_test.create_payment(applicant_dict["primary_email"], subscription_tier_list[applicant_dict["applicant_status"]["subscription_tier"]])
-    return JSONResponse(content={"success": "Applicant Approved, Payment Requested"}, status_code=200)
+    return mongo_test.send_payment(applicant_dict["id"])
 
 
 @app.post('/webhook')
@@ -93,11 +97,21 @@ async def handle_webhook(request: Request):
     # Handle the event
     if event.type == 'checkout.session.completed':
         session = event.data.object
-        universal_applicant_id = session.metadata.u_id
+        universal_applicant_id = session.metadata.id
         customer_id = session.customer
-        print("u_id: " + universal_applicant_id)
+        print("id: " + universal_applicant_id)
         print("customer_id: " + customer_id)
         return JSONResponse(content={'customer_id': customer_id})
+
+    # Mongo: Change applicant paid -> true, attach customer id to applicant
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['ApplicationForm']
+    target_collection = db['ApprovedApplications']
+
+    # Update document
+    query = {"id": str(universal_applicant_id)}
+    new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id), "approved": True}}
+    target_collection.update_one(query, new_values)
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
