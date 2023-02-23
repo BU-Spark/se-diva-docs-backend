@@ -7,6 +7,7 @@ from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request, HTTPException
 import stripe
+import pymongo
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
@@ -98,6 +99,18 @@ async def handle_webhook(request: Request):
         print("u_id: " + universal_applicant_id)
         print("customer_id: " + customer_id)
         return JSONResponse(content={'customer_id': customer_id})
+
+    # Mongo: Change applicant paid -> true, attach customer id to applicant
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['ApplicationForm']
+    target_collection = db['ApprovedApplications']
+
+    target_collection.update_one({'id': str(universal_applicant_id)}, {'$set': {'applicant_status.paid': True}})
+
+    # Update document
+    query = {"id": str(universal_applicant_id)}
+    new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id)}}
+    target_collection.update_one(query, new_values)
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
