@@ -56,6 +56,13 @@ def view_applicants(response: Response):
     response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
     return response
 
+@app.get("/applicants/view/{id}")
+def view_applicant(id: str, response: Response):
+    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    applicant = next((a for a in applicants if a.get('id') == id), None)
+    response = JSONResponse(content=applicant)
+    return response
+
 @app.get("/approvedapplicants/view")
 def view_approved_applicants(): 
     return mongo_test.get_all_approved()
