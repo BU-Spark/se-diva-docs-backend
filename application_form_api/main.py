@@ -93,9 +93,9 @@ async def handle_webhook(request: Request):
     # Handle the event
     if event.type == 'checkout.session.completed':
         session = event.data.object
-        universal_applicant_id = session.metadata.u_id
+        universal_applicant_id = session.metadata.id
         customer_id = session.customer
-        print("u_id: " + universal_applicant_id)
+        print("id: " + universal_applicant_id)
         print("customer_id: " + customer_id)
         return JSONResponse(content={'customer_id': customer_id})
 
@@ -106,7 +106,7 @@ async def handle_webhook(request: Request):
 
     # Update document
     query = {"id": str(universal_applicant_id)}
-    new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id)}}
+    new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id), "approved": True}}
     target_collection.update_one(query, new_values)
 
     # Return a 200 response to acknowledge receipt of the event
