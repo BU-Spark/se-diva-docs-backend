@@ -10,7 +10,7 @@ import stripe
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
-webhook_secret = "whsec_34d1b16bc211ba244123bf9fccebf7e286632563298ca36bc186df76d5bf09b6"
+webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
 
 app = FastAPI()
 router = APIRouter()
@@ -91,10 +91,13 @@ async def handle_webhook(request: Request):
         raise HTTPException(status_code=401, detail=str(e))
 
     # Handle the event
-    if event.type == 'payment_intent.succeeded':
-        payment_intent = event.data.object
-        return JSONResponse(content={'received': True})
-        # Do something with the payment_intent object, e.g. mark the order as paid
+    if event.type == 'checkout.session.completed':
+        session = event.data.object
+        universal_applicant_id = session.metadata.u_id
+        customer_id = session.customer
+        print("u_id: " + universal_applicant_id)
+        print("customer_id: " + customer_id)
+        return JSONResponse(content={'customer_id': customer_id})
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})

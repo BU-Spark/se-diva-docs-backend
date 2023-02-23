@@ -31,7 +31,7 @@ class YesNoDontKnowResponse(str, Enum):
     dont_know = "Don't Know"
 
 
-class BWMDNChapterQuestion(str, Enum):
+class BWQuestion(str, Enum):
     no = "No"
     yes = "Yes"
     no_additional = "No, but I would like more information about starting a branch in my region"
@@ -55,12 +55,12 @@ class ApplicantStatus(BaseModel):
     subscription_tier: Optional[str]
     approved: Optional[bool]
     paid: Optional[bool]
-    payment_link: Optional[str]
+    stripe_customer_id: Optional[str]
     account_password: Optional[str]
 
 
 class Applicant(BaseModel):
-    universal_applicant_id: str
+    id: str
     first_name: str
     middle_name: Optional[str]
     last_name: str
@@ -76,7 +76,7 @@ class Applicant(BaseModel):
     specialty: str
     areas_of_work: str
     geographic_region: str
-    bwmdn_chapter_question: BWMDNChapterQuestion
+    bwmdn_chapter_question: BWQuestion
     membership_directory_agreement: YesNoDontKnowResponse
     resume_included_question: YesNoDontKnowResponse
     divadocs_boston_member: DivaDocsBostonMember
