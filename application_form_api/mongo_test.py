@@ -226,3 +226,17 @@ def send_payment(u_id):
     server.quit()
 
     return JSONResponse(content={'success':'Email sent'}, status_code=200)
+
+def get_all_approved():
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['ApplicationForm']
+    target_collection = db['ApprovedApplications']
+    # Print all documents in collection
+
+    output_list = []
+
+    for x in target_collection.find():
+        output_list.append(x)
+
+    return output_list
+    
