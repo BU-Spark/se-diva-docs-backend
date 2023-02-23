@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 import stripe
 import smtplib
 from email.mime.multipart import MIMEMultipart
+from fastapi.responses import JSONResponse
+
 #from bson.objectid import ObjectId
 
 def write_to_mongo(document, database, collection):
@@ -129,7 +131,7 @@ def send_payment(u_id):
         source_collection = db['SubmittedApplications']
         target_collection = db['ApprovedApplications']
     except Exception as e:
-        return{'error':'mongo connection error'}
+        return JSONResponse(content={'error':'mongo connection error'}, status_code=400)
 
     # Find the document with "id" field equals to U_ID
     
@@ -187,7 +189,7 @@ def send_payment(u_id):
         metadata={"id": id}
     )
     else:
-        return {'error': 'Subscription Tier Not Assigned'}
+        return JSONResponse(content={'error': 'Subscription Tier Not Assigned'}, status_code=400)
 
     # Send Email ----
 
@@ -208,7 +210,7 @@ def send_payment(u_id):
         server.starttls()
         server.login(from_email, password)
     except Exception as e:
-        return {'error': 'not able to connect to email server'}
+        return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
 
     
 
@@ -222,3 +224,5 @@ def send_payment(u_id):
 
     # Close the server connection
     server.quit()
+
+    return JSONResponse(content={'success':'Email sent'}, status_code=200)
