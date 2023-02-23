@@ -49,6 +49,10 @@ def store_applicants(applicant: Applicant):
 def view_applicants():
     return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
 
+@app.get("/approvedapplicants/view")
+def view_approved_applicants():
+    return mongo_test.get_all_approved()
+
 
 @app.post("/applicants/resume/upload")
 async def upload_file(upload_file: UploadFile = File(...)):
