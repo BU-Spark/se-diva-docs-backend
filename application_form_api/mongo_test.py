@@ -115,61 +115,95 @@ def send_email(recipient_email):
 
     print("Passcode sent successfully!")
 
-def create_payment(applicant_email, payment_amount):
+def send_payment(u_id):
 
-    # Set your API key
-    stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
+    # Get the ID
 
-    # Get the product ID for the existing product in Stripe
-    product_id = "prod_NMcFlXPcoySWZy"
+    id = u_id # Change to U_ID in production
 
-    # Create a Price object for the product
-    price = stripe.Price.create(
-        unit_amount=1000,  # The price in cents
-        currency="usd",
-        product=product_id,
-    )
-    payment_link = stripe.PaymentLink.create(line_items=[{"price": 'price_1MbtLkIOQGSqv0xRSLJAeh9d', "quantity": 1}])
-
-    
-    # Save payment link and applicant information in your database
-    
-    # Establish Connection to MongoDB
+    # Connect to MongoDB
 
     client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['ApplicationForm']
+    source_collection = db['SubmittedApplications']
+    target_collection = db['ApprovedApplications']
 
-    # Select Database
-
-    mydb = client['ApplicationForm']
-
-    # Select Collection
-
-    mycol = mydb['SubmittedApplications']
-
-    # specify the document by the email field
+    # Find the document with "id" field equals to U_ID
     
-    query = {"email": "user_email"}
+    document = source_collection.find_one({"id": id})
 
-    # specify the field you want to update and its new value
+    applicant_email = document['primary_email']
     
-    set_payment_link = {"$set": {"applicant_status.payment_link": payment_link}}
-    set_status = {"$set": {"applicant_status.approved": True}}
+    # Move the Applicant to Approved Applications
 
-    # update the document using the update_one method
-    mycol.update_one(query, set_payment_link)
-    mycol.update_one(query, set_status)
+    target_collection.insert_one(document)
 
+    # Delete the Applicant from Submitted Applications
 
-    # 2. Send payment link to applicant via email
-    msg = MIMEMultipart()
-    msg['From'] = 'vinay.metlapalli@gmail.com'
-    msg['To'] = applicant_email
-    msg['Subject'] = 'Payment Required for Website Access'
-    body = 'Please click on the following link to make your payment: ' + str(payment_link['url'])
-    msg.attach(MIMEText(body, 'plain'))
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    source_collection.delete_one({'_id': 'document_id'})
+
+    # Close the MongoDB connection
+    
+    client.close()
+
+    # Set your API key ---
+    
+    stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
+
+    # Generate the Link
+
+    Joycelyn_Elders_Society_PID = "price_1MeN0IIOQGSqv0xR4a3TP4kh"
+    Barbara_Ross_Society_PID = "price_1MekfBIOQGSqv0xRJlTX6dBv"
+    Alexa_Canaday_Society_PID = "price_1MekghIOQGSqv0xRC2WHmstG"
+    Mae_Jemison_Society_PID = "price_1MekibIOQGSqv0xRIc1rEmRj"
+    Nancy_Oriol_Society_PID = "price_1MekjsIOQGSqv0xRz7oBw3No"
+
+    if document["applicant_status"]["subscription_tier"] == "Joycelyn Elders Society":
+        payment_link = stripe.PaymentLink.create(
+        line_items=[{"price": Joycelyn_Elders_Society_PID, "quantity": 1}],
+        metadata={"id": id}
+    )
+    elif document["applicant_status"]["subscription_tier"] == "Barbara Ross Society":
+        payment_link = stripe.PaymentLink.create(
+        line_items=[{"price": Barbara_Ross_Society_PID, "quantity": 1}],
+        metadata={"id": id}
+    )
+    elif document["applicant_status"]["subscription_tier"] == "Alexa Canaday Society":
+        payment_link = stripe.PaymentLink.create(
+        line_items=[{"price": Alexa_Canaday_Society_PID, "quantity": 1}],
+        metadata={"id": id}
+    )
+    elif document["applicant_status"]["subscription_tier"] == "Mae Jemison Society":
+        payment_link = stripe.PaymentLink.create(
+        line_items=[{"price": Mae_Jemison_Society_PID, "quantity": 1}],
+        metadata={"id": id}
+    )
+    elif document["applicant_status"]["subscription_tier"] == "Nancy Oriol Society":
+        payment_link = stripe.PaymentLink.create(
+        line_items=[{"price": Nancy_Oriol_Society_PID, "quantity": 1}],
+        metadata={"id": id}
+    )
+
+    # Send Email ----
+
+    # Email settings
+    from_email = "vinay.metlapalli@gmail.com"
+    to_email = applicant_email
+    password = "mttjbrfwvzxsouql"
+
+    # Compose the email message
+    message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")    
+    message['From'] = from_email
+    message['To'] = applicant_email
+    message['Subject'] = 'Your BlackWomenMDNetwork Application has been Approved!'
+
+    # Connect to the email server
+    server = smtplib.SMTP("smtp.gmail.com", 587)
     server.starttls()
-    server.login('vinay.metlapalli@gmail.com', 'mttjbrfwvzxsouql')
-    text = msg.as_string()
-    server.sendmail('vinay.metlapalli@gmail.com', applicant_email, text)
+    server.login(from_email, password)
+
+    # Send the email
+    server.sendmail(from_email, to_email, message.as_string())
+
+    # Close the server connection
     server.quit()
