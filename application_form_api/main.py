@@ -101,17 +101,17 @@ async def handle_webhook(request: Request):
         customer_id = session.customer
         print("id: " + universal_applicant_id)
         print("customer_id: " + customer_id)
-        return JSONResponse(content={'customer_id': customer_id})
+        # return JSONResponse(content={'customer_id': customer_id})
 
-    # Mongo: Change applicant paid -> true, attach customer id to applicant
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-    db = client['ApplicationForm']
-    target_collection = db['ApprovedApplications']
+        # Mongo: Change applicant paid -> true, attach customer id to applicant
+        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+        db = client['ApplicationForm']
+        target_collection = db['ApprovedApplications']
 
-    # Update document
-    query = {"id": str(universal_applicant_id)}
-    new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id), "approved": True}}
-    target_collection.update_one(query, new_values)
+        # Update document
+        query = {"id": str(universal_applicant_id)}
+        new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id), "approved": True}}
+        target_collection.update_one(query, new_values)
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})

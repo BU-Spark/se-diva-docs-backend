@@ -223,7 +223,7 @@ def send_payment(u_id):
     # Close the server connection
     server.quit()
 
-    return JSONResponse(content={'success':'Email sent'}, status_code=200)
+    return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
 def get_all_approved():
     client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
