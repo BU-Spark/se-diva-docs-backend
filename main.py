@@ -60,6 +60,9 @@ def view_applicants(response: Response):
 def view_applicant(id: str, response: Response):
     applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
     applicant = next((a for a in applicants if a.get('id') == id), None)
+    if not applicant:
+        return JSONResponse(content={'error': 'Applicant not found'}, status_code=404)
+
     response = JSONResponse(content=applicant)
     return response
 
