@@ -51,8 +51,10 @@ def store_applicants(applicant: Applicant):
 @app.get("/applicants/view")
 def view_applicants(response: Response):
     applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    response = JSONResponse(content=applicants)
     response.headers["X-Total-Count"] = str(len(applicants))
-    return applicants
+    response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
+    return response
 
 @app.get("/approvedapplicants/view")
 def view_approved_applicants(): 
