@@ -104,9 +104,7 @@ async def handle_webhook(request: Request):
     client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
     db = client['ApplicationForm']
     target_collection = db['ApprovedApplications']
-
-    target_collection.update_one({'id': str(universal_applicant_id)}, {'$set': {'applicant_status.paid': True}})
-
+    
     # Update document
     query = {"id": str(universal_applicant_id)}
     new_values = {"$set": {"paid": True, "stripe_customer_id": str(customer_id)}}
