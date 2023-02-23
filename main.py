@@ -1,5 +1,4 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
@@ -13,8 +12,12 @@ import pymongo
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
 
-app = FastAPI()
-router = APIRouter()
+app = FastAPI(
+    title="DivaDocs API",
+    description="DivaDocs Backend API",
+    version="1.0.0",
+    expose_headers=["X-Total-Count"],
+)
 
 # Configure CORS
 origins = [
