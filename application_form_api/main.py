@@ -71,7 +71,7 @@ def download_file(name_file: str):
 @app.post("/applicants/requestpayment")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    mongo_test.create_payment(applicant_dict["primary_email"], subscription_tier_list[applicant_dict["applicant_status"]["subscription_tier"]])
+    mongo_test.send_payment(applicant_dict["id"])
     return JSONResponse(content={"success": "Applicant Approved, Payment Requested"}, status_code=200)
 
 
