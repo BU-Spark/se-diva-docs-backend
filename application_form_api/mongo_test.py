@@ -237,4 +237,17 @@ def get_all_approved():
         output_list.append(x)
 
     return output_list
+
+def get_password(email):
+    # connect to the MongoDB client
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['ApplicationForm']
+    approved_applicants = db['ApprovedApplications']
+    # search for the applicant with the given email
+    applicant = approved_applicants.find_one({'primary_email': email})
+    if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
+        password = applicant['applicant_status']['account_password']
+        return JSONResponse(content={'success': password}, status_code=200)
+    else:
+        return JSONResponse(content={'failure': 'applicant not paid/approved'}, status_code=400)
     
