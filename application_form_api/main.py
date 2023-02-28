@@ -1,5 +1,4 @@
 from fastapi import FastAPI, UploadFile, File
-from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from models import Applicant
 import mongo_test
@@ -13,8 +12,12 @@ import pymongo
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
 
-app = FastAPI()
-router = APIRouter()
+app = FastAPI(
+    title="DivaDocs API",
+    description="DivaDocs Backend API",
+    version="1.0.0",
+    expose_headers=["X-Total-Count"],
+)
 
 # Configure CORS
 origins = [
@@ -46,11 +49,25 @@ def store_applicants(applicant: Applicant):
 
 
 @app.get("/applicants/view")
-def view_applicants():
-    return mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+def view_applicants(response: Response):
+    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    response = JSONResponse(content=applicants)
+    response.headers["X-Total-Count"] = str(len(applicants))
+    response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
+    return response
+
+@app.get("/applicants/view/{id}")
+def view_applicant(id: str, response: Response):
+    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    applicant = next((a for a in applicants if a.get('id') == id), None)
+    if not applicant:
+        return JSONResponse(content={'error': 'Applicant not found'}, status_code=404)
+
+    response = JSONResponse(content=applicant)
+    return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants():
+def view_approved_applicants(): 
     return mongo_test.get_all_approved()
 
 
