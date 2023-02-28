@@ -230,7 +230,6 @@ def get_all_approved():
     db = client['ApplicationForm']
     target_collection = db['ApprovedApplications']
     # Print all documents in collection
-
     output_list = []
 
     for x in target_collection.find({}, {"_id": 0}):
@@ -245,6 +244,7 @@ def get_password(email):
     approved_applicants = db['ApprovedApplications']
     # search for the applicant with the given email
     applicant = approved_applicants.find_one({'primary_email': email})
+
     if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
         password = applicant['applicant_status']['account_password']
         return JSONResponse(content={'success': password}, status_code=200)
