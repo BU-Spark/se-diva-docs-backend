@@ -233,7 +233,7 @@ def get_all_approved():
 
     output_list = []
 
-    for x in target_collection.find():
+    for x in target_collection.find({}, {"_id": 0}):
         output_list.append(x)
 
     return output_list
