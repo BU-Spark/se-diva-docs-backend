@@ -74,7 +74,7 @@ class Applicant(BaseModel):
     current_hospital_company: Optional[str]
     current_position: Optional[str]
     specialty: str
-    areas_of_work: str
+    areas_of_work: Optional[List[str]]
     geographic_region: str
     bwmdn_chapter_question: BWQuestion
     membership_directory_agreement: YesNoDontKnowResponse
