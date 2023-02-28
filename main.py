@@ -68,7 +68,7 @@ def view_applicant(id: str, response: Response):
 
 @app.get("/approvedapplicants/view")
 def view_approved_applicants(): 
-    return mongo_test.get_all_approved()
+    return JSONResponse(content=mongo_test.get_all_approved(), status_code=200)
 
 
 @app.post("/applicants/resume/upload")
