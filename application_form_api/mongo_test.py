@@ -248,11 +248,13 @@ def get_password(email):
     except Exception as e:
         return JSONResponse(content={'failure': 'applicant not found'}, status_code=400)
 
-    if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
-        password = applicant['applicant_status']['account_password']
-        return JSONResponse(content={'success': password}, status_code=200)
-    else:
-        return JSONResponse(content={'failure': 'applicant not paid/approved'}, status_code=400)
+    return applicant
+
+    # if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
+    #     password = applicant['applicant_status']['account_password']
+    #     return JSONResponse(content={'success': password}, status_code=200)
+    # else:
+    #     return JSONResponse(content={'failure': 'applicant not paid/approved'}, status_code=400)
 
 def applicant_denied(u_id):
     # Get the ID
