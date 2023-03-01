@@ -148,7 +148,7 @@ async def handle_webhook(request: Request):
 
 def authenticate_user(username: str, password: str):
     user = mongo_test.get_password(username)
-    if not user or not CryptContext.pwd_context.verify(password, user["applicant_status"]["account_password"]):
+    if user["applicant_status"]["account_password"] != password:
         return False
     return user
 
