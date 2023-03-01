@@ -243,7 +243,10 @@ def get_password(email):
     db = client['ApplicationForm']
     approved_applicants = db['ApprovedApplications']
     # search for the applicant with the given email
-    applicant = approved_applicants.find_one({'primary_email': email})
+    try:
+        applicant = approved_applicants.find_one({'primary_email': email})
+    except Exception as e:
+        return JSONResponse(content={'failure': 'applicant not found'}, status_code=400)
 
     if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
         password = applicant['applicant_status']['account_password']
