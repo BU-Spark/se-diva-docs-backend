@@ -148,7 +148,7 @@ async def handle_webhook(request: Request):
 
 def authenticate_user(username: str, password: str):
     user = mongo_test.get_password(username)
-    if not user or not CryptContext.pwd_context.verify(password, user["applicant_status"]["account_password"]):
+    if user["applicant_status"]["account_password"] != password:
         return False
     return user
 
@@ -167,7 +167,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
-        data={"sub": user["username"]},
+        data={"sub": user["primary_email"]},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     return {"access_token": access_token, "token_type": "bearer"}
