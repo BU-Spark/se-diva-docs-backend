@@ -7,10 +7,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request, HTTPException
 import stripe
 import pymongo
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordRequestForm
+from passlib.context import CryptContext
+import jwt
+from datetime import datetime, timedelta
+
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
 webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
+
+# This is the secret key used to sign JWT tokens. Replace it with a secret of your own.
+SECRET_KEY = "mysecretkey"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(
     title="DivaDocs API",
@@ -133,3 +144,30 @@ async def handle_webhook(request: Request):
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
+
+
+def authenticate_user(username: str, password: str):
+    user = mongo_test.get_password(username)
+    if not user or not CryptContext.pwd_context.verify(password, user["applicant_status"]["account_password"]):
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+@app.post("/login")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token = create_access_token(
+        data={"sub": user["username"]},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
