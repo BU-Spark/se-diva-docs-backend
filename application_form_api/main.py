@@ -12,7 +12,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 import jwt
 from datetime import datetime, timedelta
-
+from fastapi.security import OAuth2PasswordBearer
+import uvicorn
+from passlib.context import CryptContext
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
@@ -22,6 +24,27 @@ webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
 SECRET_KEY = "mysecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# generate a new password hash
+def generate_password(password: str):
+    return pwd_context.hash(password)
+
+# check if a password matches a hash
+def verify_password(password: str, password_hash: str):
+    return pwd_context.verify(password, password_hash)
+
+# store the password hash in the database
+def store_password(username: str, password: str):
+    password_hash = generate_password(password)
+    # store the password hash in the database along with the user's email (username)
+    mongo_test.store_password(username, password_hash)
+
+# generate a random password
+def generate_random_password(length=12):
+    return pwd_context.genword(length=length)
 
 app = FastAPI(
     title="DivaDocs API",
@@ -131,6 +154,8 @@ async def handle_webhook(request: Request):
         print("id: " + universal_applicant_id)
         print("customer_id: " + customer_id)
         # return JSONResponse(content={'customer_id': customer_id})
+        
+        password = generate_random_password()
 
         # Mongo: Change applicant paid -> true, attach customer id to applicant
         client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
@@ -171,3 +196,25 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/protected_endpoint")
+async def protected_endpoint(token: str = Depends(oauth2_scheme)):
+    # authenticate the user based on the token
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    return {"SUCCESS": "YOU HAVE LOGGED IN!"}
+
+def decode_token(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        # query the database to get the user by username
+        user = mongo_test.get_user_by_username(username)
+        return user
+    except jwt.JWTError:
+        return None
+    
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")
