@@ -165,7 +165,7 @@ async def handle_webhook(request: Request):
 
         # Update document
         query = {"id": str(universal_applicant_id)}
-        new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant.status.account_password": str(password)}}
+        new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant_status.account_password": str(password)}}
         target_collection.update_one(query, new_values)
         mongo_test.send_login_email(universal_applicant_id, password)
         
