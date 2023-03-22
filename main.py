@@ -14,7 +14,8 @@ import jwt
 from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 import uvicorn
-from passlib.context import CryptContext
+from passlib.pwd import genword
+
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
