@@ -349,8 +349,7 @@ def send_login_email(uid, password):
     try:
         client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
-        source_collection = db['SubmittedApplications']
-        target_collection = db['DeniedApplications']
+        source_collection = db['ApprovedApplications']
     except Exception as e:
         return JSONResponse(content={'error':'mongo connection error'}, status_code=400)
 
