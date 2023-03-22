@@ -425,12 +425,12 @@ def send_forgotPassword_email(username, input_password, hashed_password):
     try:
     # Send the email
         server.sendmail(from_email, to_email, message.as_string())
+        server.quit()
+        return JSONResponse(content={'Success': 'Password Reset'}, status_code=200)
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
 
-    # Close the server connection
-    server.quit()
 
 
         
