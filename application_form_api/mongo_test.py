@@ -323,4 +323,27 @@ def applicant_denied(u_id):
 
     return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
+def pull_approved_applicants():
+    
+    # Establish Connection to MongoDB
+
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+
+    # Select Database
+
+    mydb = client['ApplicationForm']
+
+    # Select Collection
+
+    mycol = mydb['ApprovedApplicants']
+
+    # Print all documents in collection
+    output_list = []
+
+    for document in mycol.find({"applicant_status.paid": True}):
+        output_list.append(document)
+
+    return output_list
+
+
     
