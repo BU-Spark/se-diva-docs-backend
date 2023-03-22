@@ -37,6 +37,10 @@ def generate_password(password: str):
 def generate_random_password(length=12):
     return genword(length=length)
 
+# check if a password matches a hash
+def verify_password(password: str, password_hash: str):
+    return pwd_context.verify(password, password_hash)
+
 app = FastAPI(
     title="DivaDocs API",
     description="DivaDocs Backend API",
@@ -166,7 +170,8 @@ async def handle_webhook(request: Request):
 
 def authenticate_user(username: str, password: str):
     user = mongo_test.get_password(username)
-    if user["applicant_status"]["account_password"] != password:
+    hashed_pass = verify_password(password)
+    if user["applicant_status"]["account_password"] != hashed_pass:
         return False
     return user
 
