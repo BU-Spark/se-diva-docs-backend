@@ -194,9 +194,9 @@ def send_payment(u_id):
     # Send Email ----
 
     # Email settings
-    from_email = "vinay.metlapalli@gmail.com"
+    from_email = "bwmnd34569@gmail.com"
     to_email = applicant_email
-    password = "mttjbrfwvzxsouql"
+    password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
     message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")    
@@ -292,9 +292,9 @@ def applicant_denied(u_id):
     # Send Email ----
 
     # Email settings
-    from_email = "vinay.metlapalli@gmail.com"
+    from_email = "bwmnd34569@gmail.com"
     to_email = applicant_email
-    password = "mttjbrfwvzxsouql"
+    password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
     message = MIMEText(f"Your application to the BlackWomenMDNetwork has been denied. Thank you for your application.")    
@@ -361,9 +361,9 @@ def send_login_email(uid, password):
     applicant_email = document['primary_email']
 
     # Email settings
-    from_email = "vinay.metlapalli@gmail.com"
+    from_email = "bwmnd34569@gmail.com"
     to_email = applicant_email
-    password = "mttjbrfwvzxsouql"
+    password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
     message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {password}.")    
