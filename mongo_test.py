@@ -407,7 +407,7 @@ def send_forgotPassword_email(username):
     password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
-    message = MIMEText(f"Here is your account information. Your login is your email: {applicant_email} and your password is: {user_password}.")    
+    message = MIMEText(f"Here is your account information. Your login is your email: {to_email} and your password is: {user_password}.")    
     message['From'] = from_email
     message['To'] = to_email
     message['Subject'] = 'BlackWomenMDNetwork Forgot Password'
@@ -422,7 +422,7 @@ def send_forgotPassword_email(username):
 
     # Send the email
     try:
-    # Send the email
+        # Send the email
         server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
