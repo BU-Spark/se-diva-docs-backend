@@ -212,8 +212,8 @@ def decode_token(token):
         # query the database to get the user by username
         user = mongo_test.get_user_by_username(username)
         return user
-    except jwt.JWTError:
-        return None
+    except Exception as e:
+        return e
     
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")
