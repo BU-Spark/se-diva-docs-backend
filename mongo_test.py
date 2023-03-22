@@ -345,7 +345,7 @@ def pull_approved_applicants():
 
     return output_list
 
-def send_login_email(uid, password):
+def send_login_email(uid, input_password):
     try:
         client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
@@ -365,7 +365,7 @@ def send_login_email(uid, password):
     password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
-    message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {password}.")    
+    message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {input_password}.")    
     message['From'] = from_email
     message['To'] = applicant_email
     message['Subject'] = 'Your BlackWomenMDNetwork Login Information'
