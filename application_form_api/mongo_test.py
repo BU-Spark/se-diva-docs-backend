@@ -389,47 +389,48 @@ def send_login_email(uid, input_password):
     # Close the server connection
     server.quit()
 
-    def send_forgotPassword_email(username):
-        try:
-            client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-            db = client['ApplicationForm']
-            source_collection = db['ApprovedApplications']
+def send_forgotPassword_email(username, input_password, hashed_password):
+    try:
+        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+        db = client['ApplicationForm']
+        source_collection = db['ApprovedApplications']
+        applicant = source_collection.find_one({'primary_email': username})
+    except Exception as e:
+        return JSONResponse(content={'error':'applicant not found'}, status_code=400)
 
-            applicant = source_collection.find_one({'primary_email': "abhinoor@bu.edu"})
+    # Update document
+    query = {"id": applicant['id']}
+    new_values = {"$set": {"applicant_status.account_password": hashed_password}}
+    source_collection.update_one(query, new_values)
 
-            user_password = applicant['applicant_status']['account_password']
+    from_email = "bwmnd34569@gmail.com"
+    to_email = username
+    password = "yxqgwaxfaxizhfsq"
 
-        except Exception as e:
-            return JSONResponse(content={'error':'applicant not found'}, status_code=400)
+    # Compose the email message
+    message = MIMEText(f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")    
+    message['From'] = from_email
+    message['To'] = to_email
+    message['Subject'] = 'BlackWomenMDNetwork Forgot Password'
 
-        from_email = "bwmnd34569@gmail.com"
-        to_email = username
-        password = "yxqgwaxfaxizhfsq"
+    # Connect to the email server
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(from_email, password)
+    except Exception as e:
+        return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
 
-        # Compose the email message
-        message = MIMEText(f"Here is your account information. Your login is your email: {applicant_email} and your password is: {user_password}.")    
-        message['From'] = from_email
-        message['To'] = to_email
-        message['Subject'] = 'BlackWomenMDNetwork Forgot Password'
+    # Send the email
+    try:
+    # Send the email
+        server.sendmail(from_email, to_email, message.as_string())
+    except Exception as e:
+        # Return error message if email not sent successfully
+        return {'error': 'email not sent'}
 
-        # Connect to the email server
-        try:
-            server = smtplib.SMTP("smtp.gmail.com", 587)
-            server.starttls()
-            server.login(from_email, password)
-        except Exception as e:
-            return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
-
-        # Send the email
-        try:
-        # Send the email
-            server.sendmail(from_email, to_email, message.as_string())
-        except Exception as e:
-            # Return error message if email not sent successfully
-            return {'error': 'email not sent'}
-
-        # Close the server connection
-        server.quit()
+    # Close the server connection
+    server.quit()
 
 
         
