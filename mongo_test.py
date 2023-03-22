@@ -389,25 +389,26 @@ def send_login_email(uid, input_password):
     # Close the server connection
     server.quit()
 
-def send_forgotPassword_email(username):
+def send_forgotPassword_email(username, input_password, hashed_password):
     try:
         client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         source_collection = db['ApprovedApplications']
-
-        applicant = source_collection.find_one({'primary_email': "abhinoor@bu.edu"})
-
-        user_password = applicant['applicant_status']['account_password']
-
+        applicant = source_collection.find_one({'primary_email': username})
     except Exception as e:
         return JSONResponse(content={'error':'applicant not found'}, status_code=400)
+
+    # Update document
+    query = {"id": applicant['id']}
+    new_values = {"$set": {"applicant_status.account_password": hashed_password}}
+    source_collection.update_one(query, new_values)
 
     from_email = "bwmnd34569@gmail.com"
     to_email = username
     password = "yxqgwaxfaxizhfsq"
 
     # Compose the email message
-    message = MIMEText(f"Here is your account information. Your login is your email: {to_email} and your password is: {user_password}.")    
+    message = MIMEText(f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")    
     message['From'] = from_email
     message['To'] = to_email
     message['Subject'] = 'BlackWomenMDNetwork Forgot Password'
@@ -422,11 +423,22 @@ def send_forgotPassword_email(username):
 
     # Send the email
     try:
-        # Send the email
+    # Send the email
         server.sendmail(from_email, to_email, message.as_string())
+        server.quit()
+        return JSONResponse(content={'Success': 'Password Reset'}, status_code=200)
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
 
-    # Close the server connection
-    server.quit()
+
+
+        
+
+
+        
+
+
+
+
+    

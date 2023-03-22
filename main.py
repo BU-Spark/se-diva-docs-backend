@@ -205,6 +205,12 @@ async def protected_endpoint(token: str = Depends(oauth2_scheme)):
     
     return {"SUCCESS": "YOU HAVE LOGGED IN!"}
 
+@app.post("/forgot_password")
+def forgot_password(username: str):
+    password = generate_random_password()
+    hashed_password = generate_password(password)
+    return mongo_test.send_forgotPassword_email(username, password, hashed_password)
+
 def decode_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -214,11 +220,6 @@ def decode_token(token):
         return user
     except Exception as e:
         return e
-    
-@app.get("/forgot_password")
-def forgot_password(username: str):
-    mongo_test.send_forgotPassword_email(username)
-    return {"Success": "Login Information Sent!"}
     
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")
