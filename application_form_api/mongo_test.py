@@ -345,5 +345,51 @@ def pull_approved_applicants():
 
     return output_list
 
+def send_login_email(uid, password):
+    try:
+        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+        db = client['ApplicationForm']
+        source_collection = db['SubmittedApplications']
+        target_collection = db['DeniedApplications']
+    except Exception as e:
+        return JSONResponse(content={'error':'mongo connection error'}, status_code=400)
+
+    # Find the document with "id" field equals to U_ID
+    
+    document = source_collection.find_one({"id": uid})
+
+    applicant_email = document['primary_email']
+
+    # Email settings
+    from_email = "vinay.metlapalli@gmail.com"
+    to_email = applicant_email
+    password = "mttjbrfwvzxsouql"
+
+    # Compose the email message
+    message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {password}.")    
+    message['From'] = from_email
+    message['To'] = applicant_email
+    message['Subject'] = 'Your BlackWomenMDNetwork Login Information'
+
+    # Connect to the email server
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(from_email, password)
+    except Exception as e:
+        return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
+
+    # Send the email
+    try:
+    # Send the email
+        server.sendmail(from_email, to_email, message.as_string())
+    except Exception as e:
+        # Return error message if email not sent successfully
+        return {'error': 'email not sent'}
+
+    # Close the server connection
+    server.quit()
+
+
 
     
