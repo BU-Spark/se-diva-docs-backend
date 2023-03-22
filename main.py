@@ -151,6 +151,7 @@ async def handle_webhook(request: Request):
         # return JSONResponse(content={'customer_id': customer_id})
         
         password = generate_random_password()
+        hashed_password = generate_password(password)
 
         # Mongo: Change applicant paid -> true, attach customer id to applicant
         client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
@@ -159,7 +160,7 @@ async def handle_webhook(request: Request):
 
         # Update document
         query = {"id": str(universal_applicant_id)}
-        new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant_status.account_password": str(password)}}
+        new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant_status.account_password": str(hashed_password)}}
         target_collection.update_one(query, new_values)
         mongo_test.send_login_email(universal_applicant_id, password)
         
@@ -170,8 +171,8 @@ async def handle_webhook(request: Request):
 
 def authenticate_user(username: str, password: str):
     user = mongo_test.get_password(username)
-    hashed_pass = verify_password(password)
-    if user["applicant_status"]["account_password"] != hashed_pass:
+    hashed_password = user["applicant_status"]["account_password"]
+    if verify_password(password, hashed_password) == False:
         return False
     return user
 
