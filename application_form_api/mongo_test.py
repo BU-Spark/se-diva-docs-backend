@@ -126,6 +126,9 @@ def send_email(recipient_email):
 
 def send_payment(u_id,subscription_tier):
 
+    if len(subscription_tier) == 0:
+        return JSONResponse(content={'error': 'Subscription Tier Not Assigned'}, status_code=400)
+
     # Get the ID
 
     id = u_id # Change to U_ID in production
