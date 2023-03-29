@@ -122,6 +122,7 @@ def download_file(name_file: str):
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
+    print(applicant_dict)
     return mongo_test.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
 
 
@@ -224,7 +225,6 @@ def decode_token(token):
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant):
     applicant_dict = applicant.dict()
-    print(applicant_dict)
     return mongo_test.applicant_denied(applicant_dict["id"])
 
 @app.get("/membershipapplicants/view")
