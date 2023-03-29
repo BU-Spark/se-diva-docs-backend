@@ -146,7 +146,7 @@ def send_payment(u_id,subscription_tier):
     document1 = source_collection.find_one({"id": id})
 
     query = {"id": document1['id']}
-    new_values = {"$set": {"applicant_status.subscription_tier": subscription_tier}}
+    new_values = {"$set": {"applicant_status.subscription_tier": str(subscription_tier)}}
     target_collection.update_one(query, new_values)
 
     applicant_email = document1['primary_email']
