@@ -344,7 +344,7 @@ def pull_approved_applicants():
 
     # Select Collection
 
-    mycol = mydb['ApprovedApplicants']
+    mycol = mydb['ApprovedApplications']
 
     # Print all documents in collection
     output_list = []
