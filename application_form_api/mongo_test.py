@@ -143,7 +143,7 @@ def send_payment(u_id,subscription_tier):
 
     # Find the document with "id" field equals to U_ID
     
-    document = source_collection.find_one({"id": id})
+    document = target_collection.find_one({"id": id})
 
     query = {"id": document['id']}
     new_values = {"$set": {"applicant_status.subscription_tier": subscription_tier}}
