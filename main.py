@@ -224,6 +224,7 @@ def decode_token(token):
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant):
     applicant_dict = applicant.dict()
+    print(applicant_dict)
     return mongo_test.applicant_denied(applicant_dict["id"])
 
 @app.get("/membershipapplicants/view")
