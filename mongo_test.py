@@ -143,15 +143,17 @@ def send_payment(u_id,subscription_tier):
 
     # Find the document with "id" field equals to U_ID
     
-    document = target_collection.find_one({"id": id})
+    document1 = source_collection.find_one({"id": id})
 
-    query = {"id": document['id']}
+    query = {"id": document1['id']}
     new_values = {"$set": {"applicant_status.subscription_tier": subscription_tier}}
     target_collection.update_one(query, new_values)
 
-    applicant_email = document['primary_email']
+    applicant_email = document1['primary_email']
     
     # Move the Applicant to Approved Applications
+
+    document = source_collection.find_one({"id": id})
 
     target_collection.insert_one(document)
 
