@@ -122,7 +122,7 @@ def download_file(name_file: str):
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    return mongo_test.send_payment(applicant_dict["id"])
+    return mongo_test.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
 
 
 @app.post('/webhook')
