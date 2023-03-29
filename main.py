@@ -53,6 +53,7 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8080",
+    "https://blackwomenmdnetwork.com",
 ]
 
 app.add_middleware(
@@ -122,7 +123,6 @@ def download_file(name_file: str):
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    print(applicant_dict)
     return mongo_test.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
 
 
@@ -147,8 +147,6 @@ async def handle_webhook(request: Request):
         session = event.data.object
         universal_applicant_id = session.metadata.id
         customer_id = session.customer
-        print("id: " + universal_applicant_id)
-        print("customer_id: " + customer_id)
         # return JSONResponse(content={'customer_id': customer_id})
         
         password = generate_random_password()
