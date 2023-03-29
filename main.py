@@ -229,6 +229,6 @@ def decline_applicant(applicant: Applicant):
 def membershipapplicants_view():
     all_applicants = mongo_test.pull_approved_applicants()
     return JSONResponse(content=all_applicants, status_code=200)
-    
+  
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")

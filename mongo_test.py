@@ -126,6 +126,9 @@ def send_email(recipient_email):
 
 def send_payment(u_id,subscription_tier):
 
+    if len(subscription_tier) == 0:
+        return JSONResponse(content={'error': 'Subscription Tier Not Assigned'}, status_code=400)
+
     # Get the ID
 
     id = u_id # Change to U_ID in production
@@ -138,7 +141,6 @@ def send_payment(u_id,subscription_tier):
         source_collection = db['SubmittedApplications']
         target_collection = db['ApprovedApplications']
     except Exception as e:
-        print('mongo connection error')
         return JSONResponse(content={'error':'mongo connection error'}, status_code=400)
 
     # Find the document with "id" field equals to U_ID
@@ -154,7 +156,6 @@ def send_payment(u_id,subscription_tier):
     # Move the Applicant to Approved Applications
 
     document = source_collection.find_one({"id": id})
-    print(document)
 
     target_collection.insert_one(document)
 
@@ -204,7 +205,6 @@ def send_payment(u_id,subscription_tier):
         metadata={"id": id}
     )
     else:
-        print('subscription tier not assigned')
         return JSONResponse(content={'error': 'Subscription Tier Not Assigned'}, status_code=400)
 
     # Send Email ----
@@ -235,12 +235,10 @@ def send_payment(u_id,subscription_tier):
         #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
-        print('email not sent')
         return {'error': 'email not sent'}
 
     # Close the server connection
     #server.quit()
-    print('email sent successfully')
     return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
 def get_all_approved():
