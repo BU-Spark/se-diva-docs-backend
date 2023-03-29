@@ -349,7 +349,7 @@ def pull_approved_applicants():
     # Print all documents in collection
     output_list = []
 
-    for document in mycol.find({"applicant_status.paid": True}):
+    for document in mycol.find({"applicant_status.paid": True}, {"_id": 0}):
         output_list.append(document)
 
     return output_list
