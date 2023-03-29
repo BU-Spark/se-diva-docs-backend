@@ -205,6 +205,12 @@ async def protected_endpoint(token: str = Depends(oauth2_scheme)):
     
     return {"SUCCESS": "YOU HAVE LOGGED IN!"}
 
+@app.post("/forgot_password")
+def forgot_password(username: str):
+    password = generate_random_password()
+    hashed_password = generate_password(password)
+    return mongo_test.send_forgotPassword_email(username, password, hashed_password)
+
 def decode_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
