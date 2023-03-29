@@ -124,7 +124,7 @@ def send_email(recipient_email):
 
     print("Passcode sent successfully!")
 
-def send_payment(u_id):
+def send_payment(u_id,subscription_tier):
 
     # Get the ID
 
@@ -144,6 +144,10 @@ def send_payment(u_id):
     # Find the document with "id" field equals to U_ID
     
     document = source_collection.find_one({"id": id})
+
+    query = {"id": document['id']}
+    new_values = {"$set": {"applicant_status.subscription_tier": subscription_tier}}
+    target_collection.update_one(query, new_values)
 
     applicant_email = document['primary_email']
     
