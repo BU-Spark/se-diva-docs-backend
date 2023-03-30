@@ -231,7 +231,8 @@ def send_payment(u_id,subscription_tier):
     # Send the email
     try:
     # Send the email
-        send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Approved!", f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")
+        send_email_with_template(to_email, document['first_name'], "d-e4a2d364df9b4cfdba541a87462b8cae", payment_link)
+        #send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Approved!", f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")
         #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
@@ -329,7 +330,8 @@ def applicant_denied(u_id):
     # Send the email
     try:
     # Send the email
-        send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Denied", f"Your application to the BlackWomenMDNetwork has been denied. Thank you for your application.")
+        send_email_with_template(to_email, document['first_name'], "d-1f3fad49f3e547f690281db893e95e24", "")
+        #send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Denied", f"Your application to the BlackWomenMDNetwork has been denied. Thank you for your application.")
         #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
@@ -398,7 +400,8 @@ def send_login_email(uid, input_password):
     # Send the email
     try:
     # Send the email
-        send_email_twilio(applicant_email, 'Your BlackWomenMDNetwork Login Information', f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {input_password}.")
+        send_login_info_email(applicant_email, document['first_name'], input_password)
+        #send_email_twilio(applicant_email, 'Your BlackWomenMDNetwork Login Information', f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {input_password}.")
         #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
@@ -462,3 +465,64 @@ def send_email_twilio(to_email, email_subject,message):
         print(response.headers)
     except Exception as e:
         print(e)
+
+def send_email_with_template(to_email, user_name, template_id, payment_link):
+    # Replace "your_sendgrid_api_key" with your actual SendGrid API key
+
+    message = Mail(
+        from_email=("vinaymet@bu.edu", "Vinay"),
+        to_emails=to_email,
+        is_multiple=True
+    )
+
+    # Pass your dynamic content using the substitution tags you used in your template
+    
+    # If not payment link email
+    
+    if len(payment_link) == 0:
+        message.dynamic_template_data = {
+        "applicant_name": user_name,
+    }
+    else:
+        message.dynamic_template_data = {
+        "applicant_name": user_name,
+        "payment_link": str(payment_link)
+    }
+
+    # Set the template ID you got from the SendGrid dashboard
+    message.template_id = template_id
+
+    try:
+        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(f"Email sent! Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+def send_login_info_email(to_email, user_name, user_password):
+    # Replace "your_sendgrid_api_key" with your actual SendGrid API key
+
+    message = Mail(
+        from_email=("vinaymet@bu.edu", "Vinay"),
+        to_emails=to_email,
+        is_multiple=True
+    )
+
+    # Pass your dynamic content using the substitution tags you used in your template
+    
+    # If not payment link email
+    message.dynamic_template_data = {
+    "applicant_name": user_name,
+    "user_email": to_email,
+    "user_password": user_password
+    }
+
+    # Set the template ID you got from the SendGrid dashboard
+    message.template_id = "d-a9905f686a794214a43a8e10a45d3cc3"
+
+    try:
+        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(f"Email sent! Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
