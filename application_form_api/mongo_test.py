@@ -231,7 +231,7 @@ def send_payment(u_id,subscription_tier):
     # Send the email
     try:
     # Send the email
-        send_email_with_template(to_email, document['first_name'], "d-e4a2d364df9b4cfdba541a87462b8cae", payment_link)
+        send_email_with_template(to_email, document['first_name'], "d-e4a2d364df9b4cfdba541a87462b8cae", payment_link['url'])
         #send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Approved!", f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")
         #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
