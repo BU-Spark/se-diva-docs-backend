@@ -6,7 +6,6 @@ from enum import Enum
 class SponsorQuestionAnswers(str, Enum):
     no = "No"
     yes = "Yes"
-    no
 
 
 class SponsorQuestion(BaseModel):
