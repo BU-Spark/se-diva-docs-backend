@@ -193,8 +193,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user["primary_email"]},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
-    return {"access_token": str(access_token)}
-   # return {"access_token": str(access_token), "token_type": "bearer"}
+    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/protected_endpoint")
 async def protected_endpoint(token: str = Depends(oauth2_scheme)):
