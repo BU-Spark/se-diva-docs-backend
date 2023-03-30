@@ -94,33 +94,14 @@ def download_file_from_mongo(database, file_name):
 
 def send_email(recipient_email):
     # Email settings
-    #from_email = "vinay.metlapalli@gmail.com"
-    to_email = "abhinoor@bu.edu"
-    #password = "mttjbrfwvzxsouql"
 
+    to_email = "abhinoor@bu.edu"
+    
     # Generate a 4-digit passcode
     passcode = str(random.randint(1000, 9999))
 
-    # Compose the email message
-    #message = f"Your application to the BlackWomenMDNetwork has been approved. Visit our website at: https://blackwomenmdnetwork.com/ and use this passcode when creating an account: {passcode}"
-    # Compose the email message
-    # message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved! Visit our website at: https://blackwomenmdnetwork.com/ and use this passcode when creating an account: {passcode}")
-    # message['From'] = from_email
-    # message['To'] = to_email
-    # message['Subject'] = 'Your BlackWomenMDNetwork Application has been Approved!'
-
-
-    # # Connect to the email server
-    # server = smtplib.SMTP("smtp.gmail.com", 587)
-    # server.starttls()
-    # server.login(from_email, password)
-
     # Send the email
     send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Approved!", f"Your application to the BlackWomenMDNetwork has been approved! Visit our website at: https://blackwomenmdnetwork.com/ and use this passcode when creating an account: {passcode}")
-    #server.sendmail(from_email, to_email, message.as_string())
-
-    # Close the server connection
-    #server.quit()
 
     print("Passcode sent successfully!")
 
@@ -209,31 +190,12 @@ def send_payment(u_id,subscription_tier):
 
     # Send Email ----
 
-    # Email settings
-    # from_email = "bwmnd34569@gmail.com"
     to_email = applicant_email
-    # password = "yxqgwaxfaxizhfsq"
-
-    # # Compose the email message
-    # message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")    
-    # message['From'] = from_email
-    # message['To'] = applicant_email
-    # message['Subject'] = 'Your BlackWomenMDNetwork Application has been Approved!'
-
-    # # Connect to the email server
-    # try:
-    #     server = smtplib.SMTP("smtp.gmail.com", 587)
-    #     server.starttls()
-    #     server.login(from_email, password)
-    # except Exception as e:
-    #     return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
-
+   
     # Send the email
     try:
     # Send the email
         send_email_with_template(to_email, document['first_name'], "d-e4a2d364df9b4cfdba541a87462b8cae", payment_link['url'])
-        #send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Approved!", f"Your application to the BlackWomenMDNetwork has been approved! Please pay your membership fee here: {str(payment_link['url'])}")
-        #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
@@ -266,12 +228,6 @@ def get_password(email):
         return JSONResponse(content={'failure': 'applicant not found'}, status_code=400)
 
     return applicant
-
-    # if applicant['applicant_status']['approved'] and applicant['applicant_status']['paid']:
-    #     password = applicant['applicant_status']['account_password']
-    #     return JSONResponse(content={'success': password}, status_code=200)
-    # else:
-    #     return JSONResponse(content={'failure': 'applicant not paid/approved'}, status_code=400)
 
 def applicant_denied(u_id):
     # Get the ID
@@ -308,37 +264,15 @@ def applicant_denied(u_id):
 
     # Send Email ----
 
-    # Email settings
-    # from_email = "bwmnd34569@gmail.com"
     to_email = applicant_email
-    # password = "yxqgwaxfaxizhfsq"
-
-    # # Compose the email message
-    # message = MIMEText(f"Your application to the BlackWomenMDNetwork has been denied. Thank you for your application.")    
-    # message['From'] = from_email
-    # message['To'] = applicant_email
-    # message['Subject'] = 'Your BlackWomenMDNetwork Application has been Denied'
-
-    # # Connect to the email server
-    # try:
-    #     server = smtplib.SMTP("smtp.gmail.com", 587)
-    #     server.starttls()
-    #     server.login(from_email, password)
-    # except Exception as e:
-    #     return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
 
     # Send the email
     try:
     # Send the email
         send_email_with_template(to_email, document['first_name'], "d-1f3fad49f3e547f690281db893e95e24", "")
-        #send_email_twilio(to_email, "Your BlackWomenMDNetwork Application has been Denied", f"Your application to the BlackWomenMDNetwork has been denied. Thank you for your application.")
-        #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
-
-    # Close the server connection
-    #server.quit()
 
     return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
@@ -378,37 +312,13 @@ def send_login_email(uid, input_password):
 
     applicant_email = document['primary_email']
 
-    # Email settings
-    from_email = "bwmnd34569@gmail.com"
-    to_email = applicant_email
-    password = "yxqgwaxfaxizhfsq"
-
-    # # Compose the email message
-    # message = MIMEText(f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {input_password}.")    
-    # message['From'] = from_email
-    # message['To'] = applicant_email
-    # message['Subject'] = 'Your BlackWomenMDNetwork Login Information'
-
-    # # Connect to the email server
-    # try:
-    #     server = smtplib.SMTP("smtp.gmail.com", 587)
-    #     server.starttls()
-    #     server.login(from_email, password)
-    # except Exception as e:
-    #     return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
-
     # Send the email
     try:
     # Send the email
         send_login_info_email(applicant_email, document['first_name'], input_password)
-        #send_email_twilio(applicant_email, 'Your BlackWomenMDNetwork Login Information', f"Your application to the BlackWomenMDNetwork has been approved. Thank you for your application. Your login is your email: {applicant_email} and your password is: {input_password}.")
-        #server.sendmail(from_email, to_email, message.as_string())
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
-
-    # Close the server connection
-    #server.quit()
 
 def send_forgotPassword_email(username, input_password, hashed_password):
     try:
@@ -428,25 +338,9 @@ def send_forgotPassword_email(username, input_password, hashed_password):
     to_email = username
     password = "yxqgwaxfaxizhfsq"
 
-    # # Compose the email message
-    # message = MIMEText(f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")    
-    # message['From'] = from_email
-    # message['To'] = to_email
-    # message['Subject'] = 'BlackWomenMDNetwork Forgot Password'
-
-    # # Connect to the email server
-    # try:
-    #     server = smtplib.SMTP("smtp.gmail.com", 587)
-    #     server.starttls()
-    #     server.login(from_email, password)
-    # except Exception as e:
-    #     return JSONResponse(content={'error': 'not able to connect to email server'}, status_code=400)
-
-    # Send the email
     try:
-    # Send the email
-        #send_email_twilio(to_email, 'BlackWomenMDNetwork Forgot Password', f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")
-        send_forgot_password_email(to_email, applicant['primary_email'], input_password)
+        # Send the email
+        send_forgot_password_email(to_email, applicant['first_name'], input_password)
         return JSONResponse(content={'Success': 'Password Reset'}, status_code=200)
     except Exception as e:
         # Return error message if email not sent successfully
@@ -475,8 +369,6 @@ def send_email_with_template(to_email, user_name, template_id, payment_link):
         to_emails=to_email,
         is_multiple=True
     )
-
-    # Pass your dynamic content using the substitution tags you used in your template
     
     # If not payment link email
     
@@ -555,5 +447,3 @@ def send_forgot_password_email(to_email, user_name, user_password):
         print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending email: {e}")
-
-
