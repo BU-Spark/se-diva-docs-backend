@@ -445,7 +445,8 @@ def send_forgotPassword_email(username, input_password, hashed_password):
     # Send the email
     try:
     # Send the email
-        send_email_twilio(to_email, 'BlackWomenMDNetwork Forgot Password', f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")
+        #send_email_twilio(to_email, 'BlackWomenMDNetwork Forgot Password', f"Here is your account information. Your login is your email: {to_email} and your password is: {input_password}.")
+        send_forgot_password_email(to_email, applicant['primary_email'], input_password)
         return JSONResponse(content={'Success': 'Password Reset'}, status_code=200)
     except Exception as e:
         # Return error message if email not sent successfully
@@ -526,3 +527,33 @@ def send_login_info_email(to_email, user_name, user_password):
         print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending email: {e}")
+
+def send_forgot_password_email(to_email, user_name, user_password):
+    # Replace "your_sendgrid_api_key" with your actual SendGrid API key
+
+    message = Mail(
+        from_email=("vinaymet@bu.edu", "Vinay"),
+        to_emails=to_email,
+        is_multiple=True
+    )
+
+    # Pass your dynamic content using the substitution tags you used in your template
+    
+    # If not payment link email
+    message.dynamic_template_data = {
+    "applicant_name": user_name,
+    "user_email": to_email,
+    "user_password": user_password
+    }
+
+    # Set the template ID you got from the SendGrid dashboard
+    message.template_id = "d-d7877e6fa8a04c42bac524d06a26efef"
+
+    try:
+        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(f"Email sent! Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
