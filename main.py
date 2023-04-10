@@ -206,6 +206,7 @@ async def protected_endpoint(token: str = Depends(oauth2_scheme)):
 
 @app.post("/forgot_password")
 def forgot_password(username: str):
+    print("Received username:", username)
     password = generate_random_password()
     hashed_password = generate_password(password)
     return mongo_test.send_forgotPassword_email(username, password, hashed_password)
