@@ -54,7 +54,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost:8080",
     "https://blackwomenmdnetwork.com",
-    "bwmdn-admin-2.web.app",
+    "https://bwmdn-admin-2.web.app",
 ]
 
 app.add_middleware(
