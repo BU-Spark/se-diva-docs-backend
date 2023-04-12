@@ -447,3 +447,15 @@ def send_forgot_password_email(to_email, user_name, user_password):
         print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending email: {e}")
+
+def get_password_admin(username):
+    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+    db = client['AdminPortal']
+    approved_applicants = db['SuperUser']
+    # search for the applicant with the given email
+    try:
+        applicant = approved_applicants.find_one({'username': username})
+    except Exception as e:
+        return JSONResponse(content={'failure': 'applicant not found'}, status_code=400)
+
+    return applicant
