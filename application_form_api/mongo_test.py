@@ -326,6 +326,8 @@ def send_forgotPassword_email(username, input_password, hashed_password):
         db = client['ApplicationForm']
         source_collection = db['ApprovedApplications']
         applicant = source_collection.find_one({'primary_email': username})
+        if applicant is None:
+            return JSONResponse(content={'error':'applicant not found'}, status_code=400)
     except Exception as e:
         return JSONResponse(content={'error':'applicant not found'}, status_code=400)
 

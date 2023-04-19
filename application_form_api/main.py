@@ -54,6 +54,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost:8080",
     "https://blackwomenmdnetwork.com",
+    "https://bwmdn-admin-2.web.app",
 ]
 
 app.add_middleware(
@@ -175,6 +176,13 @@ def authenticate_user(username: str, password: str):
         return False
     return user
 
+def authenticate_admin_user(username: str, password: str):
+    user = mongo_test.get_password(username)
+    hashed_password = user["account_password"]
+    if verify_password(password, hashed_password) == False:
+        return False
+    return user
+
 
 def create_access_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
@@ -191,6 +199,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
         data={"sub": user["primary_email"]},
+        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/admin_login")
+async def admin_login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = authenticate_admin_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token = create_access_token(
+        data={"sub": user["username"]},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     )
     return {"access_token": access_token, "token_type": "bearer"}
