@@ -72,7 +72,7 @@ uvicorn main:app --host 127.0.0.1 --port 5000 --reload
 
 The API includes the following endpoints:
 
-- `/applicants/add`: Store applicant information
+- `/applicants/add`: Add applicant form data to database
 - `/applicants/view`: View all applicants
 - `/applicants/view/{id}`: View a specific applicant by ID
 - `/applicants/resume/upload`: Upload applicant resume (PDF)
@@ -84,8 +84,6 @@ The API includes the following endpoints:
 - `/protected_endpoint`: Example of a protected endpoint that requires JWT authentication
 - `/applicants/declineapplicant`: Decline an applicant
 - `/membershipapplicants/view`: View all approved applicants
-
-## Current State
 
 ## Tips for Future Developers
 
