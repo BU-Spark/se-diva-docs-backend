@@ -83,7 +83,7 @@ The API includes the following endpoints:
 - `/admin_login`: Authenticate admin users and generate JWT tokens
 - `/protected_endpoint`: Example of a protected endpoint that requires JWT authentication
 - `/applicants/declineapplicant`: Decline an applicant
-- `/membershipapplicants/view`: View all approved applicants
+- `/membershipapplicants/view`: View all approved applicants who have paid
 
 ## Tips for Future Developers
 
