@@ -47,7 +47,7 @@ Before running the application, you need to set up the following environment var
 
 1. Clone the repository:
 ```
-git clone https://github.com/your-username/divadocs-api.git
+git clone https://github.com/BU-Spark/se-diva-docs-backend.git
 ```
 
 2. Navigate to the cloned directory
