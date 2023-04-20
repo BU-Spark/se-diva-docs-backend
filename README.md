@@ -1,4 +1,4 @@
-# BlackWomenMDNetwork
+# BlackWomenMDNetwork Backend
 
 The BWMDN Backend API is a FastAPI based backend application to manage applications, authentication, and file uploads for the DivaDocs platform. The project uses MongoDB to store and manage the data. There are various endpoints to handle the multitude of different functions across the website.
 
