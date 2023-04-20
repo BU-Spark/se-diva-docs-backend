@@ -11,17 +11,6 @@ The BWMDN Backend API is a FastAPI based backend application to manage applicati
 - [Current State](#current-state)
 - [Tips for Future Developers](#tips-for-future-developers)
 
-## Getting Started
-
-These instructions will help you set up and run the project on your local machine for development and testing purposes.
-
-### Prerequisites
-
-- Python 3.7 or higher
-- MongoDB Atlas Account and Cluster
-- Stripe Account
-- SendGrid Account
-
 ## Overview of Software Modules
 
 1. `main.py`: This is the main entry point of the application. It initializes and runs the web server, defines the API endpoints, and handles the requests and responses.
@@ -33,6 +22,16 @@ These instructions will help you set up and run the project on your local machin
 ## Flow Chart
 `main.py` depends on `mongo_test.py` for database operations, and `mongo_test.py` depends on `models.py` for data models and schemas.
 
+## Getting Started
+
+These instructions will help you set up and run the project on your local machine for development and testing purposes.
+
+### Prerequisites
+
+- Python 3.7 or higher
+- MongoDB Atlas Account and Cluster
+- Stripe Account
+- SendGrid Account
 
 ### Environment Variables
 
