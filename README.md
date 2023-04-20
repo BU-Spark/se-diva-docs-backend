@@ -61,9 +61,7 @@ pip install -r requirements.txt
 4. Run the FastAPI server:
 ```
 python3 main.py
-```
 or
-```
 uvicorn main:app --host 127.0.0.1 --port 5000 --reload
 ```
 
