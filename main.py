@@ -179,7 +179,7 @@ def authenticate_user(username: str, password: str):
 def authenticate_admin_user(username: str, password: str):
     user = mongo_test.get_password_admin(username)
     hashed_password = user["password"]
-    if verify_password(password, hashed_password) == False:
+    if not hashed_password == password:
         return False
     return user
 
