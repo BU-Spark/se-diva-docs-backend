@@ -171,6 +171,8 @@ async def handle_webhook(request: Request):
 
 def authenticate_user(username: str, password: str):
     user = mongo_test.get_password(username)
+    if not user:
+        return False
     hashed_password = user["applicant_status"]["account_password"]
     if verify_password(password, hashed_password) == False:
         return False
@@ -178,6 +180,8 @@ def authenticate_user(username: str, password: str):
 
 def authenticate_admin_user(username: str, password: str):
     user = mongo_test.get_password_admin(username)
+    if not user:
+        return False
     hashed_password = user["password"]
     print(username + " " + password + " " + hashed_password)
     if not hashed_password == password:
