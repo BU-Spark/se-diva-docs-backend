@@ -77,7 +77,7 @@ The API includes the following endpoints:
 - `/applicants/view/{id}`: View a specific applicant by ID
 - `/applicants/resume/upload`: Upload applicant resume (PDF)
 - `/applicants/downloadresume/{name_file}`: Download applicant resume
-- `/applicants/approveapplicant`: Request payment from the applicant
+- `/applicants/approveapplicant`: Approve and request payment from the applicant
 - `/webhook`: Stripe webhook endpoint
 - `/login`: Authenticate users and generate JWT tokens
 - `/admin_login`: Authenticate admin users and generate JWT tokens
