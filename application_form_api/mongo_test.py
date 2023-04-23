@@ -14,7 +14,6 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-#from bson.objectid import ObjectId
 
 def write_to_mongo(document, database, collection):
     """
