@@ -85,6 +85,21 @@ The API includes the following endpoints:
 - `/applicants/declineapplicant`: Decline an applicant
 - `/membershipapplicants/view`: View all approved applicants who have paid
 
+mongo_test.py includes the following functions:
+
+- `write_to_mongo(document, database, collection)`:Writes a given document to a specified collection in a specified database in MongoDB. 
+- `read_from_mongo(database, collection)`: This function reads all the documents from a specified collection in a specified database in MongoDB.
+- `upload_file_to_mongo(database, collection, file, file_name)`: This function uploads a file to GridFS in a specified database in MongoDB.
+- `download_file_from_mongo(database, file_name)`: This function downloads a file from GridFS in a specified database in MongoDB.
+- `send_email(recipient_email)`: This function sends an email to a specified recipient email address using SendGrid.
+- `send_payment(u_id)`: Sends a Stripe payment link to the email address of the applicant whose document was moved from Submitted to Approved DB.
+- `get_all_approved()`: This function retrieves all approved application forms.
+- `get_password(email)`: This function takes an email as an argument and retrieves the hashed account password for the user with the corresponding email address from the ApprovedApplications collection in the MongoDB database.
+- `applicant_denied(u_id)`: This function moves the applicant from the SubmittedApplications collection to the DeniedApplications collection in the MongoDB database, then using SendGrid sends a "Denied Applicant" email to the user.
+-  `pull_approved_applicants()`: This function retrieves all the documents from the ApprovedApplications collection in the MongoDB database, where the applicant_status.paid field is set to True.
+- `send_login_email(uid, input_password)`: This function sends an email to the applicant with their login information after their application has been approved.
+-  `send_forgotPassword_email(username, input_password, hashed_password)`: This function sends an email to the applicant with their new password when they request a password reset.
+
 ## Tips for Future Developers
 
 - If you face any issues with CORS, review the `origins` list in the CORS middleware configuration and update it accordingly to include the domain of your frontend application.
