@@ -15,12 +15,12 @@ The Black Women M.D. Network (BWMDN) Backend API is a FastAPI based backend appl
 
 1. `main.py`: This is the main entry point of the application. It initializes and runs the web server, defines the API endpoints, and handles the requests and responses.
 
-2. `mongo_test.py`: This module is responsible for connecting to the MongoDB database, handling database operations, and providing an interface for other modules to interact with the data.
+2. `db_functions.py`: This module is responsible for connecting to the MongoDB database, handling database operations, and providing an interface for other modules to interact with the data.
 
 3. `models.py`: This module contains the data models and schemas used throughout the application, including Pydantic models and Enums for input validation and serialization.
 
 ## Flow Chart
-`main.py` depends on `mongo_test.py` for database operations, and `mongo_test.py` depends on `models.py` for data models and schemas.
+`main.py` depends on `db_functions.py` for database operations, and `db_functions.py` depends on `models.py` for data models and schemas.
 
 ## Getting Started
 
@@ -85,7 +85,7 @@ The API includes the following endpoints:
 - `/applicants/declineapplicant`: Decline an applicant
 - `/membershipapplicants/view`: View all approved applicants who have paid
 
-mongo_test.py includes the following functions:
+db_functions.py includes the following functions:
 
 - `write_to_mongo(document, database, collection)`:Writes a given document to a specified collection in a specified database in MongoDB. 
 - `read_from_mongo(database, collection)`: This function reads all the documents from a specified collection in a specified database in MongoDB.
