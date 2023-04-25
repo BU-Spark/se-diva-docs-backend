@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse
 from models import Applicant
-import mongo_test
+import db_functions
 from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request, HTTPException
@@ -15,7 +15,9 @@ from datetime import datetime, timedelta
 from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from passlib.pwd import genword
+from dotenv import load_dotenv
 
+load_dotenv()
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
@@ -65,23 +67,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-subscription_tier_list = {
-    "student": 100,
-    "premed": 200,
-    "doctor": 300
-}
-
-
 @app.post("/applicants/add")
 def store_applicants(applicant: Applicant):
     # db.append(applicant)
-    mongo_test.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications')
+    db_functions.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications')
     return applicant
 
 
 @app.get("/applicants/view")
 def view_applicants(response: Response):
-    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications')
     response = JSONResponse(content=applicants)
     response.headers["X-Total-Count"] = str(len(applicants))
     response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
@@ -89,7 +84,7 @@ def view_applicants(response: Response):
 
 @app.get("/applicants/view/{id}")
 def view_applicant(id: str, response: Response):
-    applicants = mongo_test.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications')
     applicant = next((a for a in applicants if a.get('id') == id), None)
     if not applicant:
         return JSONResponse(content={'error': 'Applicant not found'}, status_code=404)
@@ -99,7 +94,7 @@ def view_applicant(id: str, response: Response):
 
 @app.get("/approvedapplicants/view")
 def view_approved_applicants():
-    all_applicants = mongo_test.get_all_approved()
+    all_applicants = db_functions.get_all_approved()
     return JSONResponse(content=all_applicants, status_code=200)
 
 
@@ -111,20 +106,20 @@ async def upload_file(upload_file: UploadFile = File(...)):
         content = await upload_file.read()
         image.write(content)
         image.close()
-        mongo_test.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', content, upload_file.filename)
+        db_functions.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', content, upload_file.filename)
     return JSONResponse(content={"filename": upload_file.filename, "upload_status":"data uploaded success"}, status_code=200)
 
 
 @app.get("/applicants/downloadresume/{name_file}")
 def download_file(name_file: str):
-    fileFromDB = mongo_test.download_file_from_mongo('ApplicationForm', name_file)
+    fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file)
     return Response(fileFromDB, media_type='application/pdf')
 
 
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant):
     applicant_dict = applicant.dict()
-    return mongo_test.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
+    return db_functions.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
 
 
 @app.post('/webhook')
@@ -149,7 +144,7 @@ async def handle_webhook(request: Request):
         universal_applicant_id = session.metadata.id
         customer_id = session.customer
         # return JSONResponse(content={'customer_id': customer_id})
-        
+
         password = generate_random_password()
         hashed_password = generate_password(password)
 
@@ -162,15 +157,14 @@ async def handle_webhook(request: Request):
         query = {"id": str(universal_applicant_id)}
         new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant_status.account_password": str(hashed_password)}}
         target_collection.update_one(query, new_values)
-        mongo_test.send_login_email(universal_applicant_id, password)
-        
+        db_functions.send_login_email(universal_applicant_id, password)
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
 
 
 def authenticate_user(username: str, password: str):
-    user = mongo_test.get_password(username)
+    user = db_functions.get_password(username)
     if not user:
         return False
     hashed_password = user["applicant_status"]["account_password"]
@@ -179,7 +173,7 @@ def authenticate_user(username: str, password: str):
     return user
 
 def authenticate_admin_user(username: str, password: str):
-    user = mongo_test.get_password_admin(username)
+    user = db_functions.get_password_admin(username)
     if not user:
         return False
     hashed_password = user["password"]
@@ -225,34 +219,34 @@ async def protected_endpoint(token: str = Depends(oauth2_scheme)):
     user = decode_token(token)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
-    
+
     return {"SUCCESS": "YOU HAVE LOGGED IN!"}
 
 @app.post("/forgot_password")
 def forgot_password(username: str):
     password = generate_random_password()
     hashed_password = generate_password(password)
-    return mongo_test.send_forgotPassword_email(username, password, hashed_password)
+    return db_functions.send_forgotPassword_email(username, password, hashed_password)
 
 def decode_token(token):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         # query the database to get the user by username
-        user = mongo_test.get_user_by_username(username)
+        user = db_functions.get_user_by_username(username)
         return user
     except Exception as e:
         return e
-    
+
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant):
     applicant_dict = applicant.dict()
-    return mongo_test.applicant_denied(applicant_dict["id"])
+    return db_functions.applicant_denied(applicant_dict["id"])
 
 @app.get("/membershipapplicants/view")
 def membershipapplicants_view():
-    all_applicants = mongo_test.pull_approved_applicants()
+    all_applicants = db_functions.pull_approved_applicants()
     return JSONResponse(content=all_applicants, status_code=200)
-  
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=5000, log_level="info")
