@@ -355,7 +355,7 @@ def send_forgotPassword_email(username, input_password, hashed_password):
     
     source_collection.update_one(query, new_values)
 
-    from_email = "bwmnd34569@gmail.com"
+    from_email = "info@blackwomenmdnetwork.com"
     
     to_email = username
     
@@ -371,7 +371,7 @@ def send_forgotPassword_email(username, input_password, hashed_password):
 
 def send_email_twilio(to_email, email_subject,message):
     message = Mail(
-    from_email='vinaymet@bu.edu',
+    from_email = "info@blackwomenmdnetwork.com"
     to_emails=str(to_email),
     subject=str(email_subject),
     html_content=str(message))
@@ -385,7 +385,7 @@ def send_email_twilio(to_email, email_subject,message):
 def send_email_with_template(to_email, user_name, template_id, payment_link):
    
     message = Mail(
-        from_email=("vinaymet@bu.edu", "Vinay"),
+        from_email=("info@blackwomenmdnetwork.com", "Black Women MD Network"),
         to_emails=to_email,
         is_multiple=True
     )
@@ -416,7 +416,7 @@ def send_login_info_email(to_email, user_name, user_password):
     # Replace "your_sendgrid_api_key" with your actual SendGrid API key
 
     message = Mail(
-        from_email=("vinaymet@bu.edu", "Vinay"),
+        from_email=("info@blackwomenmdnetwork.com", "Black Women MD Network"),
         to_emails=to_email,
         is_multiple=True
     )
@@ -444,7 +444,7 @@ def send_forgot_password_email(to_email, user_name, user_password):
     # Replace "your_sendgrid_api_key" with your actual SendGrid API key
 
     message = Mail(
-        from_email=("vinaymet@bu.edu", "Vinay"),
+        from_email=("info@blackwomenmdnetwork.com", "Black Women MD Network"),
         to_emails=to_email,
         is_multiple=True
     )
