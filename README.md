@@ -87,7 +87,7 @@ The API includes the following endpoints:
 
 db_functions.py includes the following functions:
 
-- `write_to_mongo(document, database, collection)`:Writes a given document to a specified collection in a specified database in MongoDB. 
+- `write_to_mongo(document, database, collection)`: Writes a given document to a specified collection in a specified database in MongoDB. 
 - `read_from_mongo(database, collection)`: This function reads all the documents from a specified collection in a specified database in MongoDB.
 - `upload_file_to_mongo(database, collection, file, file_name)`: This function uploads a file to GridFS in a specified database in MongoDB.
 - `download_file_from_mongo(database, file_name)`: This function downloads a file from GridFS in a specified database in MongoDB.
