@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request, HTTPException
 import stripe
 import pymongo
+from pymongo import MongoClient
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -18,7 +19,13 @@ from passlib.pwd import genword
 from dotenv import load_dotenv
 import os
 
+
 load_dotenv()
+
+# Create MongoDB client and return it as a dependency
+def get_mongo_client():
+    client = MongoClient(os.getenv("mongo_uri"))
+    return client
 
 # Set your Stripe API key and webhook signing secret
 stripe.api_key = os.getenv("stripe_api_key")
@@ -124,7 +131,7 @@ def requestpayment(applicant: Applicant):
 
 
 @app.post('/webhook')
-async def handle_webhook(request: Request):
+async def handle_webhook(request: Request, client: MongoClient = Depends(get_mongo_client)):
     payload = await request.body()
     sig_header = request.headers.get('Stripe-Signature')
 
@@ -150,7 +157,6 @@ async def handle_webhook(request: Request):
         hashed_password = generate_password(password)
 
         # Mongo: Change applicant paid -> true, attach customer id to applicant
-        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         target_collection = db['ApprovedApplications']
 
