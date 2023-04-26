@@ -379,6 +379,7 @@ def send_email_twilio(to_email, email_subject,message):
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
+        print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(e)
 
@@ -409,6 +410,7 @@ def send_email_with_template(to_email, user_name, template_id, payment_link):
     try:
         sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
+        print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending email: {e}")
 

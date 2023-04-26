@@ -76,7 +76,7 @@ app.add_middleware(
 )
 
 @app.post("/applicants/add")
-def store_applicants(applicant: Applicant):
+def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
     # db.append(applicant)
     db_functions.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications')
     return applicant
