@@ -305,7 +305,10 @@ def send_login_email(uid, input_password, client):
     
     document = source_collection.find_one({"id": uid})
 
-    applicant_email = document['primary_email']
+    try:
+        applicant_email = document['primary_email']
+    except Exception as e:
+        return {'error': 'user email not found'}
 
     # Send the email
     try:
