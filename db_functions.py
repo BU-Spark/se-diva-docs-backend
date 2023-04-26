@@ -13,6 +13,8 @@ from sendgrid.helpers.mail import Mail
 from dotenv import load_dotenv
 load_dotenv()
 
+SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
+
 
 def write_to_mongo(document, database, collection):
     """
@@ -375,7 +377,7 @@ def send_email_twilio(to_email, email_subject,message):
     html_content=str(message))
     
     try:
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
     except Exception as e:
         print(e)
@@ -405,7 +407,7 @@ def send_email_with_template(to_email, user_name, template_id, payment_link):
     message.template_id = template_id
 
     try:
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
     except Exception as e:
         print(f"Error sending email: {e}")
@@ -432,7 +434,7 @@ def send_login_info_email(to_email, user_name, user_password):
     message.template_id = "d-a9905f686a794214a43a8e10a45d3cc3"
 
     try:
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
         print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
@@ -460,7 +462,7 @@ def send_forgot_password_email(to_email, user_name, user_password):
     message.template_id = "d-d7877e6fa8a04c42bac524d06a26efef"
 
     try:
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        sg = SendGridAPIClient(SENDGRID_API_KEY)
         response = sg.send(message)
         print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
