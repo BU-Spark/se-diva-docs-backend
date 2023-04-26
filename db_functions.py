@@ -371,7 +371,7 @@ def send_forgotPassword_email(username, input_password, hashed_password):
 
 def send_email_twilio(to_email, email_subject,message):
     message = Mail(
-    from_email = "info@blackwomenmdnetwork.com"
+    from_email = "info@blackwomenmdnetwork.com",
     to_emails=str(to_email),
     subject=str(email_subject),
     html_content=str(message))
