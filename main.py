@@ -178,7 +178,6 @@ def authenticate_admin_user(username: str, password: str):
     if not user:
         return False
     hashed_password = user["password"]
-    print(username + " " + password + " " + hashed_password)
     if not hashed_password == password:
         return False
     return user

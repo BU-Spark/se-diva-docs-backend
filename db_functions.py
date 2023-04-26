@@ -10,6 +10,9 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 def write_to_mongo(document, database, collection):
     """
@@ -151,7 +154,7 @@ def send_payment(u_id, subscription_tier):
 
     # Set your API key ---
 
-    stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
+    stripe.api_key = os.getenv("stripe_api_key")
 
     # Generate the Link
 
@@ -374,9 +377,6 @@ def send_email_twilio(to_email, email_subject,message):
     try:
         sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
     except Exception as e:
         print(e)
 
@@ -407,7 +407,6 @@ def send_email_with_template(to_email, user_name, template_id, payment_link):
     try:
         sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
         response = sg.send(message)
-        print(f"Email sent! Status code: {response.status_code}")
     except Exception as e:
         print(f"Error sending email: {e}")
 
