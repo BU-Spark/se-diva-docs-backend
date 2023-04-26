@@ -16,12 +16,13 @@ from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from passlib.pwd import genword
 from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
 # Set your Stripe API key and webhook signing secret
-stripe.api_key = "sk_test_51MbreiIOQGSqv0xRllrwIKir09GURs4U3QYiLXSyKTiWqBBAoyx21Jum6e20GJpVgTg2B8f8zPz0w2D4ewIdUAWf00EUNTiFyg"
-webhook_secret = "whsec_2TUuXZRoJH0zhuBxn5HYG1ClhX9XPpbM"
+stripe.api_key = os.getenv("stripe_api_key")
+webhook_secret = os.getenv("webhook_secret")
 
 # This is the secret key used to sign JWT tokens. Replace it with a secret of your own.
 SECRET_KEY = "mysecretkey"
@@ -44,8 +45,8 @@ def verify_password(password: str, password_hash: str):
     return pwd_context.verify(password, password_hash)
 
 app = FastAPI(
-    title="DivaDocs API",
-    description="DivaDocs Backend API",
+    title="BWMDN API",
+    description="BWMDN Backend API",
     version="1.0.0",
     expose_headers=["X-Total-Count"],
 )
