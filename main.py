@@ -78,21 +78,21 @@ app.add_middleware(
 @app.post("/applicants/add")
 def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
     # db.append(applicant)
-    db_functions.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications')
+    db_functions.write_to_mongo(applicant.dict(), 'ApplicationForm', 'SubmittedApplications', client)
     return applicant
 
 
 @app.get("/applicants/view")
-def view_applicants(response: Response):
-    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client)):
+    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     response = JSONResponse(content=applicants)
     response.headers["X-Total-Count"] = str(len(applicants))
     response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
     return response
 
 @app.get("/applicants/view/{id}")
-def view_applicant(id: str, response: Response):
-    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications')
+def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client)):
+    applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     applicant = next((a for a in applicants if a.get('id') == id), None)
     if not applicant:
         return JSONResponse(content={'error': 'Applicant not found'}, status_code=404)
@@ -101,33 +101,33 @@ def view_applicant(id: str, response: Response):
     return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants():
-    all_applicants = db_functions.get_all_approved()
+def view_approved_applicants(client: MongoClient = Depends(get_mongo_client)):
+    all_applicants = db_functions.get_all_approved(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
 
 @app.post("/applicants/resume/upload")
-async def upload_file(upload_file: UploadFile = File(...)):
+async def upload_file(upload_file: UploadFile = File(...), client: MongoClient = Depends(get_mongo_client)):
     if upload_file.content_type != "application/pdf":
         return JSONResponse(content={"error": "invalid file type. Only PDF accepted", "upload_status":"data upload not successful"}, status_code=422)
     with open(upload_file.filename, 'wb') as image:
         content = await upload_file.read()
         image.write(content)
         image.close()
-        db_functions.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', content, upload_file.filename)
+        db_functions.upload_file_to_mongo('ApplicationForm', 'SubmittedApplications', content, upload_file.filename, client)
     return JSONResponse(content={"filename": upload_file.filename, "upload_status":"data uploaded success"}, status_code=200)
 
 
 @app.get("/applicants/downloadresume/{name_file}")
-def download_file(name_file: str):
-    fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file)
+def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client)):
+    fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
 
 
 @app.post("/applicants/approveapplicant")
-def requestpayment(applicant: Applicant):
+def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
     applicant_dict = applicant.dict()
-    return db_functions.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"])
+    return db_functions.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"], client)
 
 
 @app.post('/webhook')
@@ -164,14 +164,14 @@ async def handle_webhook(request: Request, client: MongoClient = Depends(get_mon
         query = {"id": str(universal_applicant_id)}
         new_values = {"$set": {"applicant_status.paid": True, "applicant_status.stripe_customer_id": str(customer_id), "applicant_status.approved": True, "applicant_status.account_password": str(hashed_password)}}
         target_collection.update_one(query, new_values)
-        db_functions.send_login_email(universal_applicant_id, password)
+        db_functions.send_login_email(universal_applicant_id, password, client)
 
     # Return a 200 response to acknowledge receipt of the event
     return JSONResponse(content={'test': True})
 
 
-def authenticate_user(username: str, password: str):
-    user = db_functions.get_password(username)
+def authenticate_user(username: str, password: str, client: MongoClient = Depends(get_mongo_client)):
+    user = db_functions.get_password(username, client)
     if not user:
         return False
     hashed_password = user["applicant_status"]["account_password"]
@@ -179,8 +179,8 @@ def authenticate_user(username: str, password: str):
         return False
     return user
 
-def authenticate_admin_user(username: str, password: str):
-    user = db_functions.get_password_admin(username)
+def authenticate_admin_user(username: str, password: str, client: MongoClient = Depends(get_mongo_client)):
+    user = db_functions.get_password_admin(username, client)
     if not user:
         return False
     hashed_password = user["password"]
@@ -229,10 +229,10 @@ async def protected_endpoint(token: str = Depends(oauth2_scheme)):
     return {"SUCCESS": "YOU HAVE LOGGED IN!"}
 
 @app.post("/forgot_password")
-def forgot_password(username: str):
+def forgot_password(username: str, client: MongoClient = Depends(get_mongo_client)):
     password = generate_random_password()
     hashed_password = generate_password(password)
-    return db_functions.send_forgotPassword_email(username, password, hashed_password)
+    return db_functions.send_forgotPassword_email(username, password, hashed_password, client)
 
 def decode_token(token):
     try:
@@ -245,13 +245,13 @@ def decode_token(token):
         return e
 
 @app.post("/applicants/declineapplicant")
-def decline_applicant(applicant: Applicant):
+def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
     applicant_dict = applicant.dict()
-    return db_functions.applicant_denied(applicant_dict["id"])
+    return db_functions.applicant_denied(applicant_dict["id"], client)
 
 @app.get("/membershipapplicants/view")
-def membershipapplicants_view():
-    all_applicants = db_functions.pull_approved_applicants()
+def membershipapplicants_view(client: MongoClient = Depends(get_mongo_client)):
+    all_applicants = db_functions.pull_approved_applicants(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
 if __name__ == "__main__":
