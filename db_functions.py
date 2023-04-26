@@ -16,7 +16,7 @@ load_dotenv()
 SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
 
 
-def write_to_mongo(document, database, collection):
+def write_to_mongo(document, database, collection, client):
     """
     Write a document to a MongoDB database and collection.
 
@@ -28,9 +28,6 @@ def write_to_mongo(document, database, collection):
     Returns:
         None
     """
-    # Establish connection to MongoDB
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-
     # Select database
     mydb = client[database]
 
@@ -40,7 +37,7 @@ def write_to_mongo(document, database, collection):
     # Write to the collection in the database
     x = mycol.insert_one(document)
 
-def read_from_mongo(database, collection):
+def read_from_mongo(database, collection, client):
     """
     Read all documents from a MongoDB collection.
 
@@ -51,9 +48,7 @@ def read_from_mongo(database, collection):
     Returns:
         list: A list of all documents in the collection.
     """
-    # Establish connection to MongoDB
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-
+    
     # Select database
     mydb = client[database]
 
@@ -67,7 +62,7 @@ def read_from_mongo(database, collection):
 
     return output_list
 
-def upload_file_to_mongo(database, collection, file, file_name):
+def upload_file_to_mongo(database, collection, file, file_name, client):
     """
     Upload a file to a MongoDB database and collection.
 
@@ -80,9 +75,6 @@ def upload_file_to_mongo(database, collection, file, file_name):
     Returns:
         None
     """
-    # Establish connection to MongoDB
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-
     # Select database
     mydb = client[database]
 
@@ -93,11 +85,9 @@ def upload_file_to_mongo(database, collection, file, file_name):
     fs = gridfs.GridFS(mydb)
     fs.put(file, filename=file_name)
 
-def download_file_from_mongo(database, file_name):
+def download_file_from_mongo(database, file_name, client):
 
     # Establish Connection to MongoDB
-
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
 
     mydb = client[database]
 
@@ -111,7 +101,7 @@ def download_file_from_mongo(database, file_name):
 
     return outputdata
 
-def send_payment(u_id, subscription_tier):
+def send_payment(u_id, subscription_tier, client):
 
     if len(subscription_tier) == 0:
         return JSONResponse(content={'error': 'Subscription Tier Not Assigned'}, status_code=400)
@@ -123,7 +113,6 @@ def send_payment(u_id, subscription_tier):
     # Connect to MongoDB
 
     try:
-        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         source_collection = db['SubmittedApplications']
         target_collection = db['ApprovedApplications']
@@ -208,10 +197,8 @@ def send_payment(u_id, subscription_tier):
 
     return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
-def get_all_approved():
-    
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-    
+def get_all_approved(client):
+        
     db = client['ApplicationForm']
     
     target_collection = db['ApprovedApplications']
@@ -224,12 +211,10 @@ def get_all_approved():
 
     return output_list
 
-def get_password(email):
+def get_password(email, client):
     
     # connect to the MongoDB client
-    
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-   
+       
     db = client['ApplicationForm']
     
     approved_applicants = db['ApprovedApplications']
@@ -242,7 +227,7 @@ def get_password(email):
 
     return applicant
 
-def applicant_denied(u_id):
+def applicant_denied(u_id, client):
     
     # Get the ID
 
@@ -251,7 +236,6 @@ def applicant_denied(u_id):
     # Connect to MongoDB
 
     try:
-        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         source_collection = db['SubmittedApplications']
         target_collection = db['DeniedApplications']
@@ -291,12 +275,8 @@ def applicant_denied(u_id):
 
     return JSONResponse(content={'success': 'Email sent'}, status_code=200)
 
-def pull_approved_applicants():
+def pull_approved_applicants(client):
     
-    # Establish Connection to MongoDB
-
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
-
     # Select Database
 
     mydb = client['ApplicationForm']
@@ -313,10 +293,9 @@ def pull_approved_applicants():
 
     return output_list
 
-def send_login_email(uid, input_password):
+def send_login_email(uid, input_password, client):
     
     try:
-        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         source_collection = db['ApprovedApplications']
     except Exception as e:
@@ -336,10 +315,9 @@ def send_login_email(uid, input_password):
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
 
-def send_forgotPassword_email(username, input_password, hashed_password):
+def send_forgotPassword_email(username, input_password, hashed_password, client):
     
     try:
-        client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
         db = client['ApplicationForm']
         source_collection = db['ApprovedApplications']
         applicant = source_collection.find_one({'primary_email': username})
@@ -369,7 +347,7 @@ def send_forgotPassword_email(username, input_password, hashed_password):
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
 
-def send_email_twilio(to_email, email_subject,message):
+def send_email_twilio(to_email, email_subject,message,client):
     message = Mail(
     from_email = "info@blackwomenmdnetwork.com",
     to_emails=str(to_email),
@@ -383,7 +361,7 @@ def send_email_twilio(to_email, email_subject,message):
     except Exception as e:
         print(e)
 
-def send_email_with_template(to_email, user_name, template_id, payment_link):
+def send_email_with_template(to_email, user_name, template_id, payment_link,client):
    
     message = Mail(
         from_email=("info@blackwomenmdnetwork.com", "Black Women MD Network"),
@@ -414,7 +392,7 @@ def send_email_with_template(to_email, user_name, template_id, payment_link):
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def send_login_info_email(to_email, user_name, user_password):
+def send_login_info_email(to_email, user_name, user_password,client):
     # Replace "your_sendgrid_api_key" with your actual SendGrid API key
 
     message = Mail(
@@ -470,8 +448,7 @@ def send_forgot_password_email(to_email, user_name, user_password):
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def get_password_admin(username):
-    client = pymongo.MongoClient("mongodb+srv://vinaydivadocs:divadocs@divadocsmemberportal.zhjdqu2.mongodb.net/?retryWrites=true&w=majority")
+def get_password_admin(username,client):
     db = client['AdminPortal']
     approved_applicants = db['SuperUser']
     # search for the applicant with the given email
