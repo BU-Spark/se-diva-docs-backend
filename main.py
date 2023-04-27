@@ -83,7 +83,7 @@ def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mon
 
 
 @app.get("/applicants/view")
-def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client)):
+def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     response = JSONResponse(content=applicants)
     response.headers["X-Total-Count"] = str(len(applicants))
@@ -91,7 +91,7 @@ def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_
     return response
 
 @app.get("/applicants/view/{id}")
-def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client)):
+def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     applicant = next((a for a in applicants if a.get('id') == id), None)
     if not applicant:
@@ -101,7 +101,7 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
     return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants(client: MongoClient = Depends(get_mongo_client)):
+def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     all_applicants = db_functions.get_all_approved(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
@@ -119,13 +119,13 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 
 
 @app.get("/applicants/downloadresume/{name_file}")
-def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client)):
+def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
 
 
 @app.post("/applicants/approveapplicant")
-def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
+def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     applicant_dict = applicant.dict()
     return db_functions.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"], client)
 
@@ -245,12 +245,12 @@ def decode_token(token):
         return e
 
 @app.post("/applicants/declineapplicant")
-def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
+def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     applicant_dict = applicant.dict()
     return db_functions.applicant_denied(applicant_dict["id"], client)
 
 @app.get("/membershipapplicants/view")
-def membershipapplicants_view(client: MongoClient = Depends(get_mongo_client)):
+def membershipapplicants_view(token: str = Depends(oauth2_scheme), client: MongoClient = Depends(get_mongo_client)):
     all_applicants = db_functions.pull_approved_applicants(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
