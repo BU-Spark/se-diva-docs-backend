@@ -170,7 +170,7 @@ async def handle_webhook(request: Request, client: MongoClient = Depends(get_mon
     return JSONResponse(content={'test': True})
 
 
-def authenticate_user(username: str, password: str, client: MongoClient = Depends(get_mongo_client)):
+def authenticate_user(username: str, password: str, client: MongoClient):
     user = db_functions.get_password(username, client)
     if not user:
         return False
@@ -179,7 +179,7 @@ def authenticate_user(username: str, password: str, client: MongoClient = Depend
         return False
     return user
 
-def authenticate_admin_user(username: str, password: str, client: MongoClient = Depends(get_mongo_client)):
+def authenticate_admin_user(username: str, password: str, client: MongoClient):
     user = db_functions.get_password_admin(username, client)
     if not user:
         return False
@@ -198,8 +198,8 @@ def create_access_token(data: dict, expires_delta: timedelta):
 
 
 @app.post("/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_user(form_data.username, form_data.password)
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), client: MongoClient = Depends(get_mongo_client)):
+    user = authenticate_user(form_data.username, form_data.password, client)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
@@ -209,8 +209,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/admin_login")
-async def admin_login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = authenticate_admin_user(form_data.username, form_data.password)
+async def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), client: MongoClient = Depends(get_mongo_client)):
+    user = authenticate_admin_user(form_data.username, form_data.password, client)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
