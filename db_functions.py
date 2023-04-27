@@ -349,22 +349,9 @@ def send_forgotPassword_email(username, input_password, hashed_password, client)
     except Exception as e:
         # Return error message if email not sent successfully
         return {'error': 'email not sent'}
-
-def send_email_twilio(to_email, email_subject,message,client):
-    message = Mail(
-    from_email = "info@blackwomenmdnetwork.com",
-    to_emails=str(to_email),
-    subject=str(email_subject),
-    html_content=str(message))
     
-    try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        print(f"Email sent! Status code: {response.status_code}")
-    except Exception as e:
-        print(e)
 
-def send_email_with_template(to_email, user_name, template_id, payment_link,client):
+def send_email_with_template(to_email, user_name, template_id, payment_link):
    
     message = Mail(
         from_email=("info@blackwomenmdnetwork.com", "Black Women MD Network"),
@@ -395,7 +382,7 @@ def send_email_with_template(to_email, user_name, template_id, payment_link,clie
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def send_login_info_email(to_email, user_name, user_password,client):
+def send_login_info_email(to_email, user_name, user_password):
     # Replace "your_sendgrid_api_key" with your actual SendGrid API key
 
     message = Mail(
@@ -451,7 +438,7 @@ def send_forgot_password_email(to_email, user_name, user_password):
     except Exception as e:
         print(f"Error sending email: {e}")
 
-def get_password_admin(username,client):
+def get_password_admin(username, client):
     db = client['AdminPortal']
     approved_applicants = db['SuperUser']
     # search for the applicant with the given email
