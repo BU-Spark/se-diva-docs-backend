@@ -84,6 +84,9 @@ def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mon
 
 @app.get("/applicants/view")
 def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     response = JSONResponse(content=applicants)
     response.headers["X-Total-Count"] = str(len(applicants))
@@ -92,6 +95,9 @@ def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_
 
 @app.get("/applicants/view/{id}")
 def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
     applicant = next((a for a in applicants if a.get('id') == id), None)
     if not applicant:
@@ -102,6 +108,9 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
 
 @app.get("/approvedapplicants/view")
 def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     all_applicants = db_functions.get_all_approved(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
@@ -120,12 +129,18 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 
 @app.get("/applicants/downloadresume/{name_file}")
 def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
 
 
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     applicant_dict = applicant.dict()
     return db_functions.send_payment(applicant_dict["id"], applicant_dict["applicant_status"]["subscription_tier"], client)
 
@@ -219,15 +234,6 @@ async def admin_login(form_data: OAuth2PasswordRequestForm = Depends(), client: 
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/protected_endpoint")
-async def protected_endpoint(token: str = Depends(oauth2_scheme)):
-    # authenticate the user based on the token
-    user = decode_token(token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    return {"SUCCESS": "YOU HAVE LOGGED IN!"}
-
 @app.post("/forgot_password")
 def forgot_password(username: str, client: MongoClient = Depends(get_mongo_client)):
     password = generate_random_password()
@@ -246,11 +252,17 @@ def decode_token(token):
 
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     applicant_dict = applicant.dict()
     return db_functions.applicant_denied(applicant_dict["id"], client)
 
 @app.get("/membershipapplicants/view")
 def membershipapplicants_view(token: str = Depends(oauth2_scheme), client: MongoClient = Depends(get_mongo_client)):
+    user = decode_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid token")
     all_applicants = db_functions.pull_approved_applicants(client)
     return JSONResponse(content=all_applicants, status_code=200)
 
