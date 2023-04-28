@@ -51,6 +51,42 @@ def generate_random_password(length=12):
 def verify_password(password: str, password_hash: str):
     return pwd_context.verify(password, password_hash)
 
+def decode_token(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+        # query the database to get the user by username
+        user = db_functions.get_user_by_username(username)
+        return user
+    except Exception as e:
+        return e
+    
+def authenticate_user(username: str, password: str, client: MongoClient):
+    user = db_functions.get_password(username, client)
+    if not user:
+        return False
+    hashed_password = user["applicant_status"]["account_password"]
+    if verify_password(password, hashed_password) == False:
+        return False
+    return user
+
+def authenticate_admin_user(username: str, password: str, client: MongoClient):
+    user = db_functions.get_password_admin(username, client)
+    if not user:
+        return False
+    hashed_password = user["password"]
+    if not hashed_password == password:
+        return False
+    return user
+
+
+def create_access_token(data: dict, expires_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expires_delta
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
 app = FastAPI(
     title="BWMDN API",
     description="BWMDN Backend API",
@@ -185,33 +221,6 @@ async def handle_webhook(request: Request, client: MongoClient = Depends(get_mon
     return JSONResponse(content={'test': True})
 
 
-def authenticate_user(username: str, password: str, client: MongoClient):
-    user = db_functions.get_password(username, client)
-    if not user:
-        return False
-    hashed_password = user["applicant_status"]["account_password"]
-    if verify_password(password, hashed_password) == False:
-        return False
-    return user
-
-def authenticate_admin_user(username: str, password: str, client: MongoClient):
-    user = db_functions.get_password_admin(username, client)
-    if not user:
-        return False
-    hashed_password = user["password"]
-    if not hashed_password == password:
-        return False
-    return user
-
-
-def create_access_token(data: dict, expires_delta: timedelta):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
 @app.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), client: MongoClient = Depends(get_mongo_client)):
     user = authenticate_user(form_data.username, form_data.password, client)
@@ -239,16 +248,6 @@ def forgot_password(username: str, client: MongoClient = Depends(get_mongo_clien
     password = generate_random_password()
     hashed_password = generate_password(password)
     return db_functions.send_forgotPassword_email(username, password, hashed_password, client)
-
-def decode_token(token):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        # query the database to get the user by username
-        user = db_functions.get_user_by_username(username)
-        return user
-    except Exception as e:
-        return e
 
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
