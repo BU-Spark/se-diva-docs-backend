@@ -19,6 +19,30 @@ from passlib.pwd import genword
 from dotenv import load_dotenv
 import os
 
+app = FastAPI(
+    title="BWMDN API",
+    description="BWMDN Backend API",
+    version="1.0.0",
+    expose_headers=["X-Total-Count"],
+)
+
+# Configure CORS
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    "https://blackwomenmdnetwork.com",
+    "https://bwmdn-admin-2.web.app",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 load_dotenv()
 
@@ -59,8 +83,8 @@ def decode_token(token):
         user = db_functions.get_user_by_username(username)
         return user
     except Exception as e:
-        return e
-    
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 def authenticate_user(username: str, password: str, client: MongoClient):
     user = db_functions.get_password(username, client)
     if not user:
@@ -86,30 +110,6 @@ def create_access_token(data: dict, expires_delta: timedelta):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
-
-app = FastAPI(
-    title="BWMDN API",
-    description="BWMDN Backend API",
-    version="1.0.0",
-    expose_headers=["X-Total-Count"],
-)
-
-# Configure CORS
-origins = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:8080",
-    "https://blackwomenmdnetwork.com",
-    "https://bwmdn-admin-2.web.app",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.post("/applicants/add")
 def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mongo_client)):
