@@ -89,15 +89,14 @@ def decode_token(token, client: MongoClient):
             raise HTTPException(status_code=401, detail="USER NOT FOUND")
         return user
     except jwt.ExpiredSignatureError:
-        # print("Token has expired")
+        print("Token has expired")
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
-        # print("Invalid token")
+        print("Invalid token")
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
-        # print(f"Unexpected error in decode_token: {e}")
+        print(f"Unexpected error in decode_token: {e}")
         raise HTTPException(status_code=401, detail="Unexpected error")
-
 
 
 def authenticate_user(username: str, password: str, client: MongoClient):
