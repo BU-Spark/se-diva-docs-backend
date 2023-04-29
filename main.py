@@ -108,16 +108,16 @@ def decode_token_admin(token, client: MongoClient):
         users_collection = db['SuperUser']
         user = users_collection.find_one({"username": username})
         if not user:
-            print("USER NOT FOUND")
+            print("ADMIN: USER NOT FOUND")
         return user
     except jwt.ExpiredSignatureError:
-        print("Token has expired")
+        print("ADMIN: Token has expired")
         return None
     except jwt.InvalidTokenError:
-        print("Invalid token")
+        print("ADMIN: Invalid token")
         return None
     except Exception as e:
-        print(f"Unexpected error in decode_token: {e}")
+        print(f"ADMIN: Unexpected error in decode_token: {e}")
         return None
 
 
