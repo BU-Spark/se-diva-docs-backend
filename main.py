@@ -87,7 +87,28 @@ def decode_token(token, client: MongoClient):
         user = users_collection.find_one({"primary_email": username})
         if not user:
             print("USER NOT FOUND")
-            raise HTTPException(status_code=401, detail="USER NOT FOUND")
+        return user
+    except jwt.ExpiredSignatureError:
+        print("Token has expired")
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        print("Invalid token")
+        raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        print(f"Unexpected error in decode_token: {e}")
+        raise HTTPException(status_code=401, detail="Unexpected error")
+
+def decode_token_admin(token, client: MongoClient):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username = payload.get("sub")
+
+        # Directly query the database to get the user by username
+        db = client['AdminPortal']
+        users_collection = db['SuperUser']
+        user = users_collection.find_one({"username": username})
+        if not user:
+            print("USER NOT FOUND")
         return user
     except jwt.ExpiredSignatureError:
         print("Token has expired")
@@ -135,7 +156,7 @@ def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mon
 
 @app.get("/applicants/view")
 def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
-    user = decode_token(token, client)
+    user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
@@ -146,7 +167,7 @@ def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_
 
 @app.get("/applicants/view/{id}")
 def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
-    user = decode_token(token, client)
+    user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
@@ -159,7 +180,7 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
 
 @app.get("/approvedapplicants/view")
 def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
-    user = decode_token(token, client)
+    user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     all_applicants = db_functions.get_all_approved(client)
@@ -181,7 +202,8 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 @app.get("/applicants/downloadresume/{name_file}")
 def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     user = decode_token(token, client)
-    if not user:
+    user2 = decode_token_admin(token, client)
+    if not user or user2:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
@@ -189,7 +211,7 @@ def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client
 
 @app.post("/applicants/approveapplicant")
 def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
-    user = decode_token(token, client)
+    user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     applicant_dict = applicant.dict()
@@ -266,7 +288,7 @@ def forgot_password(username: str, client: MongoClient = Depends(get_mongo_clien
 
 @app.post("/applicants/declineapplicant")
 def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
-    user = decode_token(token, client)
+    user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     applicant_dict = applicant.dict()
