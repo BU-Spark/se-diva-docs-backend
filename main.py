@@ -61,8 +61,8 @@ SECRET_KEY = "mysecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 oauth2_scheme2 = OAuth2PasswordBearer(tokenUrl="/admin_login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # generate a new password hash
