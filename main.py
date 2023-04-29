@@ -201,9 +201,10 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 
 
 @app.get("/applicants/downloadresume/{name_file}")
-def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme), token_admin: str = Depends(oauth2_scheme2)):
     user = decode_token(token, client)
-    if not user:
+    admin_user = decode_token_admin(token_admin, client)
+    if not user and not admin_user:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
