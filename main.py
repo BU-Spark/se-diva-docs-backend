@@ -86,6 +86,7 @@ def decode_token(token, client: MongoClient):
         users_collection = db['ApprovedApplications']
         user = users_collection.find_one({"primary_email": username})
         if not user:
+            print("USER NOT FOUND")
             raise HTTPException(status_code=401, detail="USER NOT FOUND")
         return user
     except jwt.ExpiredSignatureError:
