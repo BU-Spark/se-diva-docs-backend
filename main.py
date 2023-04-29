@@ -90,13 +90,13 @@ def decode_token(token, client: MongoClient):
         return user
     except jwt.ExpiredSignatureError:
         print("Token has expired")
-        raise HTTPException(status_code=401, detail="Token has expired")
+        return None
     except jwt.InvalidTokenError:
         print("Invalid token")
-        raise HTTPException(status_code=401, detail="Invalid token")
+        return None
     except Exception as e:
         print(f"Unexpected error in decode_token: {e}")
-        raise HTTPException(status_code=401, detail="Unexpected error")
+        return None
 
 def decode_token_admin(token, client: MongoClient):
     try:
@@ -112,13 +112,13 @@ def decode_token_admin(token, client: MongoClient):
         return user
     except jwt.ExpiredSignatureError:
         print("Token has expired")
-        raise HTTPException(status_code=401, detail="Token has expired")
+        return None
     except jwt.InvalidTokenError:
         print("Invalid token")
-        raise HTTPException(status_code=401, detail="Invalid token")
+        return None
     except Exception as e:
         print(f"Unexpected error in decode_token: {e}")
-        raise HTTPException(status_code=401, detail="Unexpected error")
+        return None
 
 
 def authenticate_user(username: str, password: str, client: MongoClient):
@@ -202,8 +202,8 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 @app.get("/applicants/downloadresume/{name_file}")
 def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     user = decode_token(token, client)
-    user2 = decode_token_admin(token, client)
-    if not user or user2:
+    admin_user = decode_token_admin(token, client)
+    if not user and not admin_user:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
     return Response(fileFromDB, media_type='application/pdf')
