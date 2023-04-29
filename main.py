@@ -62,6 +62,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme2 = OAuth2PasswordBearer(tokenUrl="/admin_login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # generate a new password hash
@@ -155,7 +156,7 @@ def store_applicants(applicant: Applicant, client: MongoClient = Depends(get_mon
 
 
 @app.get("/applicants/view")
-def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2)):
     user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -166,7 +167,7 @@ def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_
     return response
 
 @app.get("/applicants/view/{id}")
-def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2)):
     user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -179,7 +180,7 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
     return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2)):
     user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -200,9 +201,9 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 
 
 @app.get("/applicants/downloadresume/{name_file}")
-def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme), token2: str = Depends(oauth2_scheme2)):
     user = decode_token(token, client)
-    admin_user = decode_token_admin(token, client)
+    admin_user = decode_token_admin(token2, client)
     if not user and not admin_user:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
@@ -210,7 +211,7 @@ def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client
 
 
 @app.post("/applicants/approveapplicant")
-def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def requestpayment(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2)):
     user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -287,7 +288,7 @@ def forgot_password(username: str, client: MongoClient = Depends(get_mongo_clien
     return db_functions.send_forgotPassword_email(username, password, hashed_password, client)
 
 @app.post("/applicants/declineapplicant")
-def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def decline_applicant(applicant: Applicant, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2)):
     user = decode_token_admin(token, client)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
