@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import JSONResponse
 from models import Applicant
 import db_functions
@@ -202,9 +202,13 @@ async def upload_file(upload_file: UploadFile = File(...), client: MongoClient =
 
 
 @app.get("/applicants/downloadresume/{name_file}")
-def download_file(name_file: str, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2), token_admin: str = Depends(oauth2_scheme)):
+def download_file(name_file: str, request: Request, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme2), token_admin: str = Depends(oauth2_scheme)):
     user = decode_token(token, client)
     admin_user = decode_token_admin(token_admin, client)
+    # Print the request headers, body, and auth
+    print("Headers:", request.headers)
+    print("Body:", request.body)
+    print("Auth:", request.authorization)
     if not user and not admin_user:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
