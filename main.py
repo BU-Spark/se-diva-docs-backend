@@ -168,8 +168,10 @@ def view_applicants(response: Response, client: MongoClient = Depends(get_mongo_
     return response
 
 @app.get("/applicants/view/{id}")
-def view_applicant(id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_applicant(request: Request, id: str, response: Response, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     user = decode_token_admin(token, client)
+    print("Headers:", request.headers)
+    print("Body:", request.body)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     applicants = db_functions.read_from_mongo('ApplicationForm', 'SubmittedApplications', client)
@@ -181,10 +183,8 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
     return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants(request: Request, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     user = decode_token_admin(token, client)
-    print("Headers:", request.headers)
-    print("Body:", request.body)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     all_applicants = db_functions.get_all_approved(client)
