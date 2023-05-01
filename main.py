@@ -181,8 +181,10 @@ def view_applicant(id: str, response: Response, client: MongoClient = Depends(ge
     return response
 
 @app.get("/approvedapplicants/view")
-def view_approved_applicants(client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
+def view_approved_applicants(request: Request, client: MongoClient = Depends(get_mongo_client), token: str = Depends(oauth2_scheme)):
     user = decode_token_admin(token, client)
+    print("Headers:", request.headers)
+    print("Body:", request.body)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid token")
     all_applicants = db_functions.get_all_approved(client)
@@ -208,7 +210,6 @@ def download_file(name_file: str, request: Request, client: MongoClient = Depend
     # Print the request headers, body, and auth
     print("Headers:", request.headers)
     print("Body:", request.body)
-    print("Auth:", request.authorization)
     if not user and not admin_user:
         raise HTTPException(status_code=401, detail="Invalid token")
     fileFromDB = db_functions.download_file_from_mongo('ApplicationForm', name_file, client)
